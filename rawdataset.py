@@ -32,15 +32,15 @@ def _make_pair(x):
     return map(lambda u: (x, u), x["data"])
 
 def download_rscs(rscs, dest_dir="raw_dataset"):
-    flatten = chain.from_iterable([_make_pair(x) for x in rscs])
+    flatten = chain.from_iterable([_make_pair(x) if (not os.path.isdir(pathlib.Path(dest_dir, x["name"]))) else [] for x in rscs])
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         ftr_file_map = {executor.submit(download_http_res, pair[1], pathlib.Path(dest_dir, pair[0]["name"])): pair[1] for pair in flatten}
         for future in concurrent.futures.as_completed(ftr_file_map):
             name = ftr_file_map[future]
-        try:
-            future.result()
-        except Exception as exc:
-            print('failed to download %r with exception: %s' % (name, exc))
+            try:
+                future.result()
+            except Exception as exc:
+                print('failed to download %r with exception: %s' % (name, exc))
 
 if __name__ == "__main__":
     with open("datasets.json", 'r') as dsets:
