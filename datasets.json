@@ -1,0 +1,51 @@
+{
+    "uci_smartphone" : {
+        "name" : "uci_smartphone",
+        "description" : "Human Activity Recognition Using Smartphones Data Set",
+        "source" : "https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones",
+        "data" : ["https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.names",
+        "https://archive.ics.uci.edu/ml/machine-learning-databases/00240/UCI%20HAR%20Dataset.zip"]
+    },
+    "unimib_shar" : {
+        "name" : "unimib_shar",
+        "description" : "UniMiB SHAR, is a new dataset of acceleration samples acquired with an Android smartphone designed for human activity recognition and fall detection.",
+        "source" : "http://www.sal.disco.unimib.it/technologies/unimib-shar/",
+        "data" : ["https://www.dropbox.com/s/x2fpfqj0bpf8ep6/UniMiB-SHAR.zip?raw=1"]
+    },
+    "uci_gas_sensor" : {
+        "name" : "uci_gas_sensor",
+        "description" : "Gas sensors for home activity monitoring Data Set ",
+        "source" : "http://archive.ics.uci.edu/ml/datasets/Gas+sensors+for+home+activity+monitoring",
+        "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00362/HT_Sensor_UCIsubmission.zip"]
+    },
+    "mit_activity_home" : {
+        "name" : "mit_activity_home",
+        "description" : "Activity Recognition in the Home Setting Using Simple and Ubiquitous Sensors",
+        "source" : "http://courses.media.mit.edu/2004fall/mas622j/04.projects/home/",
+        "data" : ["http://courses.media.mit.edu/2004fall/mas622j/04.projects/home/thesis_data_txt.zip"]
+    },
+    "uci_power_consumption" : {
+        "name" : "uci_power_consumption",
+        "description" : "Individual household electric power consumption Data Set",
+        "source" : "http://archive.ics.uci.edu/ml/datasets/Individual+household+electric+power+consumption",
+        "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00235/household_power_consumption.zip"]
+    },
+    "refit_smart_home" : {
+        "name" : "refit_smart_home",
+        "description" : "REFIT Smart Home dataset",
+        "source" : "https://lboro.figshare.com/articles/REFIT_Smart_Home_dataset/2070091",
+        "data" : ["https://lboro.figshare.com/ndownloader/articles/2070091/versions/1"]
+    },
+    "uci_chest_accelerometer" : {
+        "name" : "uci_chest_accelerometer",
+        "description" : "Activity Recognition from Single Chest-Mounted Accelerometer Data Set",
+        "source" : "https://archive.ics.uci.edu/ml/datasets/Activity+Recognition+from+Single+Chest-Mounted+Accelerometer",
+        "data" : ["https://archive.ics.uci.edu/ml/machine-learning-databases/00287/Activity%20Recognition%20from%20Single%20Chest-Mounted%20Accelerometer.zip"]
+    },
+    "uci_mhealth" : {
+        "name" : "uci_mhealth",
+        "description" : "MHEALTH Dataset Data Set",
+        "source" : "http://archive.ics.uci.edu/ml/datasets/mhealth+dataset",
+        "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00319/MHEALTHDATASET.zip"]
+    }
+}
