@@ -13,6 +13,7 @@ import concurrent.futures
 def download_http_res(url, dest_dir):
     os.makedirs(dest_dir, exist_ok=True)
     filename = urlp.unquote(urlp.urlsplit(url).path.split('/')[-1])
+    print("downloading " + url)
     with req.urlopen(url) as rsp:
         cd_hdr = rsp.getheader("Content-Disposition", None)
         if cd_hdr != None:
@@ -56,7 +57,7 @@ if __name__ == "__main__":
                     target_path = pathlib.Path(rt, f[:-4])
                     if not os.path.isdir(target_path):
                         found_zip = True
-                        print("unzipping " + str(pathlib.Path(rt, f)))
+                        print("unzipping " + str(pathlib.PurePath(rt, f)))
                         with zipfile.ZipFile(pathlib.Path(rt, f), 'r') as zip_ref:
                             zip_ref.extractall(target_path)
         if not found_zip:
