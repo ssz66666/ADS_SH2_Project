@@ -4,7 +4,7 @@ import urllib.parse as urlp
 import shutil
 import pathlib
 import os
-
+import zipfile
 from itertools import chain
 
 import asyncio
@@ -44,4 +44,16 @@ def download_rscs(rscs, dest_dir="raw_dataset"):
 
 if __name__ == "__main__":
     with open("datasets.json", 'r') as dsets:
-        download_rscs(json.load(dsets).values())
+        download_rscs(json.load(dsets).values(), "raw_dataset")
+    # try to unzip any zip file
+
+    # repeat 3 times, just in case there are some nestsed zips
+    for _ in range(3):
+        for rt, _, files in os.walk("raw_dataset"):
+            for f in files:
+                if (not f.startswith(".")) and f.endswith(".zip"):
+                    target_path = pathlib.Path(rt, f[:-4])
+                    if not os.path.isdir(target_path):
+                        print("unzipping " + str(pathlib.Path(rt, f)))
+                        with zipfile.ZipFile(pathlib.Path(rt, f), 'r') as zip_ref:
+                            zip_ref.extractall(target_path)
