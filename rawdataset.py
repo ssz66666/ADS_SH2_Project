@@ -47,13 +47,17 @@ if __name__ == "__main__":
         download_rscs(json.load(dsets).values(), "raw_dataset")
     # try to unzip any zip file
 
-    # repeat 3 times, just in case there are some nestsed zips
-    for _ in range(3):
+    # repeat until no zip is found, just in case there are any nestsed zips
+    while True:
+        found_zip = False
         for rt, _, files in os.walk("raw_dataset"):
             for f in files:
                 if (not f.startswith(".")) and f.endswith(".zip"):
                     target_path = pathlib.Path(rt, f[:-4])
                     if not os.path.isdir(target_path):
+                        found_zip = True
                         print("unzipping " + str(pathlib.Path(rt, f)))
                         with zipfile.ZipFile(pathlib.Path(rt, f), 'r') as zip_ref:
                             zip_ref.extractall(target_path)
+        if not found_zip:
+            break
