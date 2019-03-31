@@ -47,5 +47,11 @@
         "description" : "MHEALTH Dataset Data Set",
         "source" : "http://archive.ics.uci.edu/ml/datasets/mhealth+dataset",
         "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00319/MHEALTHDATASET.zip"]
+    },
+    "uci_pamap2" : {
+        "name" : "uci_pamap2",
+        "description" : "PAMAP2 Physical Activity Monitoring Data Set",
+        "source" : "http://archive.ics.uci.edu/ml/datasets/PAMAP2+Physical+Activity+Monitoring",
+        "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00231/PAMAP2_Dataset.zip", "http://archive.ics.uci.edu/ml/machine-learning-databases/00231/readme.pdf"]
     }
 }
