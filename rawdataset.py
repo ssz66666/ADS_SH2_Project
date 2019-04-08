@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import json
 import urllib.request as req
 import urllib.parse as urlp
@@ -9,6 +12,8 @@ from itertools import chain
 
 import asyncio
 import concurrent.futures
+
+RAW_DATASET_PATH = "raw_dataset"
 
 def download_http_res(url, dest_dir):
     os.makedirs(dest_dir, exist_ok=True)
@@ -32,8 +37,8 @@ def download_http_res(url, dest_dir):
 def _make_pair(x):
     return map(lambda u: (x, u), x["data"])
 
-def download_rscs(rscs, dest_dir="raw_dataset"):
-    flatten = chain.from_iterable([_make_pair(x) if (not os.path.isdir(pathlib.Path(dest_dir, x["name"]))) else [] for x in rscs])
+def download_rscs(rscs, dest_dir="raw_dataset", force_download=False):
+    flatten = chain.from_iterable([_make_pair(x) if (force_download or (not os.path.isdir(pathlib.Path(dest_dir, x["name"])))) else [] for x in rscs])
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         ftr_file_map = {executor.submit(download_http_res, pair[1], pathlib.Path(dest_dir, pair[0]["name"])): pair[1] for pair in flatten}
         for future in concurrent.futures.as_completed(ftr_file_map):
@@ -43,15 +48,13 @@ def download_rscs(rscs, dest_dir="raw_dataset"):
             except Exception as exc:
                 print('failed to download %r with exception: %s' % (name, exc))
 
-if __name__ == "__main__":
-    with open("datasets.json", 'r') as dsets:
-        download_rscs(json.load(dsets).values(), "raw_dataset")
+def recursive_walk_and_unzip(path):
     # try to unzip any zip file
 
     # repeat until no zip is found, just in case there are any nestsed zips
     while True:
         found_zip = False
-        for rt, _, files in os.walk("raw_dataset"):
+        for rt, _, files in os.walk(path):
             for f in files:
                 if (not f.startswith(".")) and f.endswith(".zip"):
                     target_path = pathlib.Path(rt, f[:-4])
@@ -62,3 +65,12 @@ if __name__ == "__main__":
                             zip_ref.extractall(target_path)
         if not found_zip:
             break
+
+def main():
+    with open("datasets.json", 'r') as dsets:
+        download_rscs(json.load(dsets).values(), RAW_DATASET_PATH)
+    recursive_walk_and_unzip(RAW_DATASET_PATH)
+
+if __name__ == "__main__":
+    main()
+    
