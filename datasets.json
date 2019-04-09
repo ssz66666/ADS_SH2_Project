@@ -53,5 +53,11 @@
         "description" : "PAMAP2 Physical Activity Monitoring Data Set",
         "source" : "http://archive.ics.uci.edu/ml/datasets/PAMAP2+Physical+Activity+Monitoring",
         "data" : ["http://archive.ics.uci.edu/ml/machine-learning-databases/00231/PAMAP2_Dataset.zip", "http://archive.ics.uci.edu/ml/machine-learning-databases/00231/readme.pdf"]
+    },
+    "sphere_challenge" : {
+        "name" : "sphere_challenge",
+        "description" : "SPHERE Challenge: Activity Recognition with Multimodal Sensor Data",
+        "source" : "https://www.irc-sphere.ac.uk/sphere-challenge/data",
+        "data" : ["https://data.bris.ac.uk/datasets/8gccwpx47rav19vk8x4xapcog/8gccwpx47rav19vk8x4xapcog.zip"]
     }
 }
