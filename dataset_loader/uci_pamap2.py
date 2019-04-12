@@ -3,13 +3,13 @@
 
 import numpy as np
 import os
-from enum import Enum
 import csv
 import math
 from collections import OrderedDict
 from decimal import Decimal
 
 import dataset_loader.sqlite_util as sqlite_util
+from dataset_util.uci_pamap2 import Location
 
 DATASET_NAME = "uci_pamap2"
 
@@ -58,11 +58,6 @@ sensor_readings_n_columns = len(sensor_readings_schema) - 2
 #     "activity_id",
 #     "heart_rate",
 # ]
-
-class Location(Enum):
-    CHEST = 1
-    ANKLE = 2
-    HAND = 3
 
 def _load_dataset(path, loader_func):
     _data_path = os.path.join(path, DATA_PATH)

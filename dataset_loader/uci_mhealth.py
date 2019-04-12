@@ -6,12 +6,12 @@ DATASET_NAME = "uci_mhealth"
 # import pandas as pd
 import numpy as np
 import os
-from enum import Enum
 import csv
 from collections import OrderedDict
 from decimal import Decimal
 
 import dataset_loader.sqlite_util as sqlite_util
+from dataset_util.uci_mhealth import Location
 
 DATA_PATH = "MHEALTHDATASET/MHEALTHDATASET"
 
@@ -72,11 +72,6 @@ sensor_readings_schema = {
     "FOREIGN KEY"   : "(sample_id) REFERENCES {}(sample_id)".format(samples_table),
 }
 sensor_readings_n_columns = len(sensor_readings_schema) - 2
-
-class Location(Enum):
-    CHEST = 1
-    LEFT_ANKLE = 2
-    RIGHT_LOWER_ARM = 3
 
 def _load_dataset(path, loader):
     return OrderedDict(
