@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from enum import Enum
 import pandas as pd
 
 from dataset_loader.uci_pamap2 import samples_table, sensor_readings_table, DATASET_NAME, Location

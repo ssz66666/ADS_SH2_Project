@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from enum import Enum
-
 from dataset_loader.uci_mhealth import samples_table, sensor_readings_table, Location, DATASET_NAME
 
 raw_table_query = """
