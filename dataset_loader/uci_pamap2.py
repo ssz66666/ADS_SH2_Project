@@ -9,9 +9,7 @@ from collections import OrderedDict
 from decimal import Decimal
 
 import dataset_loader.sqlite_util as sqlite_util
-from dataset_util.uci_pamap2 import Location
-
-DATASET_NAME = "uci_pamap2"
+from dataset_util.uci_pamap2 import Location, DATASET_NAME
 
 DATA_PATH = "PAMAP2_Dataset/PAMAP2_Dataset"
 

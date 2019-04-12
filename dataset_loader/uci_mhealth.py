@@ -11,7 +11,7 @@ from collections import OrderedDict
 from decimal import Decimal
 
 import dataset_loader.sqlite_util as sqlite_util
-from dataset_util.uci_mhealth import Location
+from dataset_util.uci_mhealth import Location, DATASET_NAME
 
 DATA_PATH = "MHEALTHDATASET/MHEALTHDATASET"
 
