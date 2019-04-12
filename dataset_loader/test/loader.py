@@ -4,14 +4,15 @@ import csv
 
 with sqlite3.connect('test.db') as conn:
     cur = conn.cursor()
-
-    # data = mhealth.load_dataset_to_mem('raw_dataset/uci_mhealth')
-    # mhealth.store_dataset_to_sql(conn.cursor(), data)
+    # path = 'raw_dataset/uci_pamap2'
+    path = 'raw_dataset/uci_mhealth'
+    # data = mhealth.load_dataset_to_mem(path)
+    mhealth.load_dataset_to_sqlite(conn.cursor(), path)
 
     sql_samples = conn.execute("SELECT * FROM {}".format(mhealth.samples_table))
     sql_sensor = conn.execute("SELECT * FROM {}".format(mhealth.sensor_readings_table))
 
-    # conn.commit()
+    conn.commit()
 
     with open('samples.csv', 'w') as f1:
         writer = csv.writer(f1)

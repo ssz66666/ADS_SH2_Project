@@ -8,7 +8,7 @@ from importlib.util import find_spec
 # a dataset should only use tables with name prefixed by the '{dataset_name}__'
 # e.g. "uci_smartphone.data" is a table for dataset "uci_smartphone"
 
-DATASET_SQLITE_LOADER_FUNC = "import_dataset_to_sqlite"    
+DATASET_SQLITE_LOADER_FUNC = "load_dataset_to_sqlite"    
 
 def get_dataset_loader_module(name):
     mod = locals().get(name, None)
