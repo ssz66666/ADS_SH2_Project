@@ -7,11 +7,18 @@ import csv
 import math
 from collections import OrderedDict
 from decimal import Decimal
+from enum import Enum
 
 import dataset_loader.sqlite_util as sqlite_util
-from dataset_util.uci_pamap2 import Location, DATASET_NAME
 
 DATA_PATH = "PAMAP2_Dataset/PAMAP2_Dataset"
+
+DATASET_NAME = "uci_pamap2"
+
+class Location(Enum):
+    CHEST = 1
+    ANKLE = 2
+    HAND = 3
 
 sampling_freq = Decimal('100.0')
 sampling_interval = Decimal('1') / sampling_freq

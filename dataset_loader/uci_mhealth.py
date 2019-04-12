@@ -9,11 +9,18 @@ import os
 import csv
 from collections import OrderedDict
 from decimal import Decimal
+from enum import Enum
 
 import dataset_loader.sqlite_util as sqlite_util
-from dataset_util.uci_mhealth import Location, DATASET_NAME
 
 DATA_PATH = "MHEALTHDATASET/MHEALTHDATASET"
+
+DATASET_NAME = "uci_mhealth"
+
+class Location(Enum):
+    CHEST = 1
+    LEFT_ANKLE = 2
+    RIGHT_LOWER_ARM = 3
 
 sampling_freq = Decimal('50.0')
 sampling_interval = Decimal('1.0') / sampling_freq

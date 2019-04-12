@@ -3,14 +3,7 @@
 
 from enum import Enum
 
-DATASET_NAME = "uci_mhealth"
-
-class Location(Enum):
-    CHEST = 1
-    LEFT_ANKLE = 2
-    RIGHT_LOWER_ARM = 3
-
-from dataset_loader.uci_mhealth import samples_table, sensor_readings_table
+from dataset_loader.uci_mhealth import samples_table, sensor_readings_table, Location, DATASET_NAME
 
 raw_table_query = """
 SELECT
