@@ -12,7 +12,7 @@ def query_to_sliding_windows(cur, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WIND
 
 def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     if size <= overlap:
-        raise ValueError("size must be strict greater than overlap")
+        raise ValueError("size must be strictly greater than overlap")
     count = 0
     arr = []
     for row in rows:
