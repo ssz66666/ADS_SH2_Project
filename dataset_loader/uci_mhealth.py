@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-DATASET_NAME = "uci_mhealth"
-
 # import pandas as pd
 import numpy as np
 import os
