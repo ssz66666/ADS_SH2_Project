@@ -61,7 +61,7 @@ WHERE {0}.sample_id = sid_1 AND {0}.sample_id = sid_2 AND {0}.sample_id = sid_3;
 def to_classification(df):
     return df.loc[:,"timestamp":], df.loc[:,"activity_id"]
 
-def to_sliding_windows(cur, size=preprocess.DEFAULT_WINDOW_SIZE):
+def to_sliding_windows(cur, size=preprocess.DEFAULT_WINDOW_SIZE, overlap=preprocess.DEFAULT_WINDOW_OVERLAP):
     cur.execute(distinct_subject_query)
     for subject_id in list(cur):
         yield preprocess.query_to_sliding_windows(cur.execute(
