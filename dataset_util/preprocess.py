@@ -5,11 +5,14 @@ import numpy as np
 import pandas as pd
 
 DEFAULT_WINDOW_SIZE = 100
+DEFAULT_WINDOW_OVERLAP = 0
 
-def query_to_sliding_windows(cur, size=DEFAULT_WINDOW_SIZE):
+def query_to_sliding_windows(cur, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     return to_sliding_windows(cur, list(map(lambda x: x[0], cur.description)), size)
 
-def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE):
+def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
+    if size <= overlap:
+        raise ValueError("size must be strict greater than overlap")
     count = 0
     arr = []
     for row in rows:
@@ -17,8 +20,8 @@ def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE):
         count += 1
         if count >= size:
             _arr = arr
-            count = 0
-            arr = []
+            count = overlap
+            arr = arr[size-overlap:]
             yield pd.DataFrame.from_records(_arr, columns=col_headings)
     return
             
