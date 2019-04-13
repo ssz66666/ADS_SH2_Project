@@ -60,7 +60,7 @@ def recursive_walk_and_unzip(path):
                     if not os.path.isdir(target_path):
                         found_zip = True
                         print("unzipping " + str(pathlib.PurePath(rt, f)))
-                        with zipfile.ZipFile(pathlib.Path(rt, f), 'r') as zip_ref:
+                        with zipfile.ZipFile(os.path.join(rt, f), 'r') as zip_ref:
                             zip_ref.extractall(target_path)
         if not found_zip:
             break
