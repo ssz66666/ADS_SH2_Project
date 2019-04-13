@@ -24,3 +24,5 @@ def create_table_if_not_exists(cur, table_name, schema):
 def create_table_if_not_exists_raw_schema(cur, table_name, schema_string):
     cur.execute("CREATE TABLE IF NOT EXISTS {} {}".format(table_name, schema_string))
 
+def check_sql_table_exists(cur, table_name):
+    return cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", (table_name,)).fetchone() is not None

@@ -11,12 +11,10 @@ from importlib.util import find_spec
 DATASET_SQLITE_LOADER_FUNC = "load_dataset_to_sqlite"    
 
 def get_dataset_loader_module(name):
-    mod = locals().get(name, None)
-    if mod is None:
-        if find_spec(".{}".format(name), __package__):
-            importlib.import_module(name, __package__)
-            mod = locals().get(name, None)
-    return mod
+    try:
+        return importlib.import_module(".{}".format(name), __package__)
+    except:
+        return None
 
 def get_dataset_loader(name, loader_func_name):
     mod = get_dataset_loader_module(name)

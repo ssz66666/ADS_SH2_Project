@@ -10,10 +10,9 @@ import os
 import zipfile
 from itertools import chain
 
-import asyncio
 import concurrent.futures
 
-RAW_DATASET_PATH = "raw_dataset"
+from config import RAW_DATASET_DIR as RAW_DATASET_PATH
 
 def download_http_res(url, dest_dir):
     os.makedirs(dest_dir, exist_ok=True)

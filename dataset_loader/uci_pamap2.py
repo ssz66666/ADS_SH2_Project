@@ -126,6 +126,10 @@ def sensor_readings_from_row(index, subject_id, row):
         (index, Location.ANKLE.value, *row[37:50]),
     ]
 
+def check_sqlite_table_not_exists(cur):
+    return ((not sqlite_util.check_sql_table_exists(cur, samples_table)) and
+           (not sqlite_util.check_sql_table_exists(cur, sensor_readings_table)))
+
 def store_dataset_to_sql(cur, tbls_lst):
     try:
         cur.execute("BEGIN TRANSACTION")
