@@ -20,6 +20,7 @@ def load_all_datasets(conn, path, *datasets):
         if m is not None:
             if m.check_sqlite_table_not_exists(cur):
                 m.load_dataset_to_sqlite(cur, raw_path)
+                conn.commit()
 
 def main():
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
