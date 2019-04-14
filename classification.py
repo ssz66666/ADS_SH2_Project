@@ -80,7 +80,8 @@ def main():
     n_subs = len(subject_ids)
     n_training = round(n_subs * TRAINING_SET_PROPORTION)
     n_test = n_subs - n_training
-    idx = [ features.loc["subject_id"] in subject_ids[:n_training] ]
+    idx = [ features.loc[:,"subject_id"] in subject_ids[:n_training] ]
+    print("Moved on")
     training_set = features[idx]
     test_set = features[np.logical_not(idx)]
     train_X, train_y = uci_mhealth.to_classification(training_set)
