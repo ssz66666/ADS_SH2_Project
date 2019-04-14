@@ -211,20 +211,20 @@ where $Q$ is missing values, $\hat{Q}$ is the corresponding predicted values, an
 
 \begin{table*}[t]
     \centering
-    \begin{tabular}{lrrrrrrrr}\toprule
-        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{Mean}} & \multicolumn{2}{c}{\textbf{Sample}} & \multicolumn{2}{c}{\textbf{LOCF}} & \multicolumn{2}{c}{\textbf{PMM}}\\
-        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7} \cmidrule(r){8-9}
-        & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} \\ \midrule
-        1 &   7.949 & 15.723 &  11.163 & 22.291 &	0.431   &   1.737	& 6.231 & 13.144 \\
-        2 &   5.238 &  9.932 &   7.422 & 14.038 &	0.338	&	1.315	& 4.171 & 8.593 \\
-        3 &   4.757 &  8.909 &   6.709 & 12.623 &	0.289	&	0.991	& 3.605 & 7.537 \\
-        4 &   5.367 & 10.467 &   7.633 & 14.759 &	0.299	&	0.856	& 4.192 & 8.720 \\
-        5 &   5.457 & 10.692 &   7.783 & 15.119 &	0.387	&	1.471	& 4.637 & 9.510 \\
-        6 &   5.438 & 10.286 &   7.683 & 14.503 &	0.432	&	1.923	& 4.555 & 9.121 \\
-        7 &   5.396 & 10.391 &   7.657 & 14.735 &	0.372	&	1.764	& 3.919 & 8.256 \\
-        8 &   5.315 & 10.091 &   7.537 & 14.288 &	0.377	&	1.741	& 4.094 & 8.223 \\ \bottomrule
+    \begin{tabular}{lrrrrrrrrrr}\toprule
+        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{Mean}^1} & \multicolumn{2}{c}{\textbf{Sample}^2} & \multicolumn{2}{c}{\textbf{LOCF}^3} & \multicolumn{2}{c}{\textbf{Linear}^4} & \multicolumn{2}{c}{\textbf{PMM}^5}\\
+        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7} \cmidrule(r){8-9}\cmidrule(r){10-11}
+        & \emph{MAE} & \emph{RMSE} & \emph{MAE} & \emph{RMSE} & \emph{MAE} & \emph{RMSE} & \emph{MAE} & \emph{RMSE} & \emph{MAE} & \emph{RMSE} \\ \midrule
+        1 &   7.949 & 15.723 &  11.163 & 22.291 &	0.431   &   1.737 & 0.264 & 1.206	& 6.231 & 13.144 \\
+        2 &   5.238 &  9.932 &   7.422 & 14.038 &	0.338	&	1.315 & 0.207 & 0.97	& 4.171 & 8.593 \\
+        3 &   4.757 &  8.909 &   6.709 & 12.623 &	0.289	&	0.991 & 0.179 & 0.668	& 3.605 & 7.537 \\
+        4 &   5.367 & 10.467 &   7.633 & 14.759 &	0.299	&	0.856 & 0.191 & 0.567	& 4.192 & 8.720 \\
+        5 &   5.457 & 10.692 &   7.783 & 15.119 &	0.387	&	1.471 & 0.235 & 1.047	& 4.637 & 9.510 \\
+        6 &   5.438 & 10.286 &   7.683 & 14.503 &	0.432	&	1.923 & 0.259 & 1.416	& 4.555 & 9.121 \\
+        7 &   5.396 & 10.391 &   7.657 & 14.735 &	0.372	&	1.764 & 0.242 & 1.339	& 3.919 & 8.256 \\
+        8 &   5.315 & 10.091 &   7.537 & 14.288 &	0.377	&	1.741 & 0.233 & 1.256	& 4.094 & 8.223 \\ \bottomrule
     \end{tabular}
-    \caption{Evaluation of different imputation methods on PAMAP2 dataset.}~\label{EvaluationImputation}
+    \caption{Evaluation of different imputation methods on PAMAP2 dataset. $^1$Unconditional mean imputation; $^2$Random sample from observed values; $^3$Last observation carried forward; $^4$Linear Interpolation; $^5$Predictive mean matching}~\label{EvaluationImputation}
 \end{table}
 
 \begin{equation}
