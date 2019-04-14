@@ -43,9 +43,12 @@ WHERE {0}.sample_id = {1}.sample_id;
 def to_classification(df):
     return df.loc[:,"timestamp":], df.loc[:,"activity_id"]
 
+def get_subject_ids(conn):
+    return list(map(lambda x: int(x[0]), conn.execute(distinct_subject_query)))
+
 def to_sliding_windows(conn, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     ids = conn.execute(distinct_subject_query)
-    for subject_id in list(ids):
+    for subject_id in ids:
         yield preprocess.query_to_sliding_windows(conn.execute(
-            raw_table_query_with_subject_id, (subject_id[0],)
+            raw_table_query_with_subject_id, (subject_id,)
         ), size)

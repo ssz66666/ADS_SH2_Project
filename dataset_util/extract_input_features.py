@@ -76,6 +76,8 @@ def extract_features(df_windows,all_feature):
 
     return df_features
 
+all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quantile_5','fft_quantile_1',
+                    'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
 
 def main():
     # Connection to the DB and retrieve sliding windows
@@ -106,9 +108,6 @@ def main():
     column_headers = column_headers[3:len(column_headers)]
     '''
 
-
-    all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quantile_5','fft_quantile_1',
-                    'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
     features = extract_features(sliding_windows_object,all_feature)
 
     features.to_csv('input_features.csv', header=features.columns.values, index=False, sep='\t', mode='w')
