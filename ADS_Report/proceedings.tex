@@ -172,6 +172,23 @@
 %   classifiers. This section is required.}{}{}
 %
 % \keywords{\plainkeywords}
+\begin{table}[t]
+    \centering
+    \begin{tabular}{lrrrrrr}\toprule
+        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{IMU hand}} & \multicolumn{2}{c}{\textbf{IMU chest}} & \multicolumn{2}{c}{\textbf{IMU ankle}}\\
+        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7}
+        & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} \\ \midrule
+        1 & 1454 & 0.39 & 509  & 0.14 & 1327 & 0.35 \\
+        2 & 2729 & 0.61 & 387  & 0.09 & 2445 & 0.55 \\
+        3 & 522  & 0.21 & 183  & 0.07 & 527  & 0.21 \\
+        4 & 2214 & 0.67 & 213  & 0.06 & 1101 & 0.33 \\
+        5 & 1541 & 0.41 & 312  & 0.08 & 1980 & 0.53 \\
+        6 & 1021 & 0.28 & 343  & 0.09 & 1372 & 0.38 \\
+        7 & 1506 & 0.48 & 257  & 0.08 & 1037 & 0.33 \\
+        8 & 2151 & 0.53 & 1308 & 0.32 & 1951 & 0.48 \\ \bottomrule
+    \end{tabular}
+    \caption{The count and percentage of missing values in PAMAP2.}~\label{NA_PAMAP2}
+\end{table}
 
 Raw Bias (RBias), has a similar form Mean Absolute Error (MAE):
 \begin{equation}
@@ -190,26 +207,8 @@ Root Mean Square Error (RMSE)
 \end{equation}
 where $Q$ is missing values, $\hat{Q}$ is the corresponding predicted values, and $n$ is the count of missing values.
 
-
-\begin{table}[t]
-    \centering
-    \begin{tabular}{lrrrrrr}\toprule
-        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{IMU hand}} & \multicolumn{2}{c}{\textbf{IMU chest}} & \multicolumn{2}{c}{\textbf{IMU ankle}}\\
-        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7}
-        & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} \\ \midrule
-        1 & 1454 & 0.39 & 509 & 0.14 & 1327 & 0.35 \\
-        2 & 2729 & 0.61 & 387 & 0.09 & 2445 & 0.55 \\
-        3 & 522  & 0.21 & 183 & 0.07 & 527  & 0.21 \\
-        4 & 2214 & 0.67 & 213 & 0.06 & 1101 & 0.33 \\
-        5 & 1541 & 0.41 & 312 & 0.08 & 1980 & 0.53 \\
-        6 & 1021 & 0.28 & 343 & 0.09 & 1372 & 0.38 \\
-        7 & 1506 & 0.48 & 257 & 0.08 & 1037 & 0.33 \\
-        8 & 2151 & 0.53 & 1308 & 0.32 & 1951 & 0.48 \\ \bottomrule
-    \end{tabular}
-    \caption{The count and percentage of missing values in PAMAP2.}~\label{NA_PAMAP2}
-\end{table}
-
-\begin{table*}[t]
+% \vspace*{6pt}
+\begin{table*}[b]
     \centering
     \begin{tabular}{lrrrrrrrrrr}\toprule
         \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{Mean}^1} & \multicolumn{2}{c}{\textbf{Sample}^2} & \multicolumn{2}{c}{\textbf{LOCF}^3} & \multicolumn{2}{c}{\textbf{Linear}^4} & \multicolumn{2}{c}{\textbf{PMM}^5}\\
@@ -225,6 +224,24 @@ where $Q$ is missing values, $\hat{Q}$ is the corresponding predicted values, an
         8 &   5.315 & 10.091 &   7.537 & 14.288 &	0.377	&	1.741 & 0.233 & 1.256	& 4.094 & 8.223 \\ \bottomrule
     \end{tabular}
     \caption{Evaluation of different imputation methods on PAMAP2 dataset. $^1$Unconditional mean imputation; $^2$Random sample from observed values; $^3$Last observation carried forward; $^4$Linear Interpolation; $^5$Predictive mean matching}~\label{EvaluationImputation}
+\end{table}
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{lrrrr}\toprule
+        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{Cubic Spline}} & \multicolumn{2}{c}{\textbf{Elastic Net}}\\
+        \cmidrule(r){2-3} \cmidrule(r){4-5}
+        & \emph{MAE} & \emph{RMSE} & \emph{MSE} & \emph{RMSE}  \\ \midrule
+        1 & 0.217 & 0.461 & 10.584 & 13.510 \\
+        2 & 0.472 & 1.053 &  9.370 & 13.467 \\
+        3 & 0.138 & 0.364 &  9.303 & 12.417 \\
+        4 & 0.181 & 0.608 & 10.308 & 13.651 \\
+        5 & 0.262 & 0.542 &  9.642 & 13.000 \\
+        6 & 0.300 & 0.782 & 13.592 & 18.123 \\
+        7 & 0.183 & 0.437 & 10.568 & 14.038 \\
+        8 & 1.426 & 2.250 & 15.755 & 21.255 \\ \bottomrule
+    \end{tabular}
+    \caption{Performance of heart rate imputation using cubic spline interpolation and elastic net. The performance of elastic net is obtained by averaging the results of 10-fold cross validation. The parameters have been fine-tuned in each validation.}~\label{HRImputation}
 \end{table}
 
 \begin{equation}
