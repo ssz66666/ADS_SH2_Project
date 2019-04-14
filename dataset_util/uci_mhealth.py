@@ -14,7 +14,21 @@ distinct_activity_query = """
 SELECT DISTINCT activity_id FROM {};
 """.format(samples_table)
 
-raw_table_query_with_subject_id = ("""
+raw_table_valid_data_query = ("""
+SELECT
+    activity_id, subject_id,
+""" +
+", ".join(mul_str_arr(["chest_acc"], ["x","y","z"]) +
+    ["ecg_1", "ecg_2"] +
+    mul_str_arr(["left_ankle", "right_lower_arm"],
+                ["acc", "gyro", "magn"],
+                ["x", "y", "z"])) + """
+FROM
+    {0}, {1}
+WHERE {0}.sample_id = {1}.sample_id AND activity_id != 0;
+""").format(samples_table, sensor_readings_table)
+
+raw_table_valid_data_query_with_subject_id = ("""
 SELECT
     activity_id, timestamp, subject_id,
 """ +
@@ -43,7 +57,7 @@ WHERE {0}.sample_id = {1}.sample_id;
 """).format(samples_table, sensor_readings_table)
 
 def to_classification(df):
-    return df.iloc[:,1:], df.loc[:,"activity_id"]
+    return df.iloc[:,2:], df.loc[:,"activity_id"]
 
 def get_subject_ids(conn):
     return list(map(lambda x: int(x[0]), conn.execute(distinct_subject_query)))
@@ -55,5 +69,5 @@ def to_sliding_windows(conn, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OV
     ids = get_subject_ids(conn)
     for subject_id in ids:
         yield preprocess.query_to_sliding_windows(conn.execute(
-            raw_table_query_with_subject_id, (subject_id,)
-        ), size)
+            raw_table_valid_data_query_with_subject_id, (subject_id,)
+        ), size, overlap)
