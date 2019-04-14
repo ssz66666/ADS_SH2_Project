@@ -10,15 +10,11 @@ from decimal import Decimal
 from enum import Enum
 
 import dataset_loader.sqlite_util as sqlite_util
+from misc import mul_str_arr
 
 DATA_PATH = "MHEALTHDATASET/MHEALTHDATASET"
 
 DATASET_NAME = "uci_mhealth"
-
-class Location(Enum):
-    CHEST = 1
-    LEFT_ANKLE = 2
-    RIGHT_LOWER_ARM = 3
 
 sampling_freq = Decimal('50.0')
 sampling_interval = Decimal('1.0') / sampling_freq
@@ -49,34 +45,31 @@ sampling_interval = Decimal('1.0') / sampling_freq
 #     "label",
 # ]
 
-samples_table = "{}__samples".format(DATASET_NAME)
-samples_schema = {
-    "sample_id"     : "INTEGER PRIMARY KEY",
-    "timestamp"     : "DECIMAL",
-    "subject_id"    : "INTEGER",
-    "activity_id"   : "INTEGER",
-}
+samples_table = "__".join([DATASET_NAME, "samples"])
+samples_schema = OrderedDict([
+    ("sample_id"     , "INTEGER PRIMARY KEY"),
+    ("timestamp"     , "DECIMAL"),
+    ("subject_id"    , "INTEGER"),
+    ("activity_id"   , "INTEGER"),
+])
 samples_n_columns = len(samples_schema)
 
-sensor_readings_table = "{}__sensor_readings".format(DATASET_NAME)
-sensor_readings_schema = {
-    "sample_id"     : "INTEGER NOT NULL",
-    "location"      : "INTEGER NOT NULL",
-    "acc_x"         : "FLOAT NOT NULL",
-    "acc_y"         : "FLOAT NOT NULL",
-    "acc_z"         : "FLOAT NOT NULL",
-    "gyro_x"        : "FLOAT",
-    "gyro_y"        : "FLOAT",
-    "gyro_z"        : "FLOAT",
-    "magn_x"        : "FLOAT",
-    "magn_y"        : "FLOAT",
-    "magn_z"        : "FLOAT",
-    "ecg_1"         : "FLOAT",
-    "ecg_2"         : "FLOAT",
-    "PRIMARY KEY"   : "(sample_id, location)",
-    "FOREIGN KEY"   : "(sample_id) REFERENCES {}(sample_id)".format(samples_table),
-}
-sensor_readings_n_columns = len(sensor_readings_schema) - 2
+sensor_readings_table = "__".join([DATASET_NAME, "sensor_readings"])
+sensor_readings_schema = OrderedDict(
+    [
+        ("sample_id", "INTEGER PRIMARY KEY"),
+    ] +
+    [
+        (k, "FLOAT") for k in
+        mul_str_arr(["chest_acc"], ["x","y","z"]) +
+        ["ecg_1", "ecg_2"] +
+        mul_str_arr(["left_ankle", "right_lower_arm"],
+                    ["acc", "gyro", "magn"],
+                    ["x", "y", "z"])
+    ] + 
+    [("FOREIGN KEY", "(sample_id) REFERENCES {}(sample_id)".format(samples_table))]
+)
+sensor_readings_n_columns = len(sensor_readings_schema) - 1
 
 def _load_dataset(path, loader):
     return OrderedDict(
@@ -120,11 +113,7 @@ def samples_from_row(index, timestamp, subject_id, row):
     return (index, str(timestamp), subject_id, row[23])
 
 def sensor_readings_from_row(index, timestamp, subject_id, row):
-    return [
-        (index, Location.CHEST.value, *row[0:3], *([None] * 6), *row[3:5]),
-        (index, Location.LEFT_ANKLE.value, *row[5:14], *([None] * 2)),
-        (index, Location.RIGHT_LOWER_ARM.value, *row[14:23], *([None] * 2)),
-    ]
+    return (index, *row[:-1])
 
 def check_sqlite_table_not_exists(cur):
     return ((not sqlite_util.check_sql_table_exists(cur, samples_table)) and
@@ -140,8 +129,7 @@ def store_dataset_to_sql(cur, tbls):
         
         for row in row_generator(tbls):
             cur.execute(_sql_stmt_samples, samples_from_row(*row))
-            for val in sensor_readings_from_row(*row):
-                cur.execute(_sql_stmt_sensors, val)
+            cur.execute(_sql_stmt_sensors, sensor_readings_from_row(*row))
         cur.execute("COMMIT TRANSACTION")
     except:
         cur.execute("ROLLBACK TRANSACTION")

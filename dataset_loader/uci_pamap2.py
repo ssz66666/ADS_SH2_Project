@@ -10,53 +10,44 @@ from decimal import Decimal
 from enum import Enum
 
 import dataset_loader.sqlite_util as sqlite_util
+from misc import mul_str_arr
 
 DATA_PATH = "PAMAP2_Dataset/PAMAP2_Dataset"
 
 DATASET_NAME = "uci_pamap2"
 
-class Location(Enum):
-    CHEST = 1
-    ANKLE = 2
-    HAND = 3
-
 sampling_freq = Decimal('100.0')
 sampling_interval = Decimal('1') / sampling_freq
 
-sampling_freq_heartrate = 9.0
-sampling_interval_heartrate = 1 / sampling_freq_heartrate
+sampling_freq_heartrate = Decimal('9.0')
+sampling_interval_heartrate = Decimal('1') / sampling_freq_heartrate
 
-samples_table = "{}__samples".format(DATASET_NAME)
-samples_schema = {
-    "sample_id"     : "INTEGER PRIMARY KEY",
-    "timestamp"     : "DECIMAL",
-    "subject_id"    : "INTEGER",
-    "activity_id"   : "INTEGER",
-    "heart_rate"    : "INTEGER",
-}
+samples_table = "__".join([DATASET_NAME, "samples"])
+samples_schema = OrderedDict([
+    ("sample_id"     , "INTEGER PRIMARY KEY"),
+    ("timestamp"     , "DECIMAL"),
+    ("subject_id"    , "INTEGER"),
+    ("activity_id"   , "INTEGER"),
+])
 samples_n_columns = len(samples_schema)
 
-sensor_readings_table = "{}__sensor_readings".format(DATASET_NAME)
-sensor_readings_schema = {
-    "sample_id"     : "INTEGER NOT NULL",
-    "location"      : "INTEGER NOT NULL",
-    "temperature"   : "FLOAT",
-    "acc_x"         : "FLOAT",
-    "acc_y"         : "FLOAT",
-    "acc_z"         : "FLOAT",
-    "acc_x_2"       : "FLOAT",
-    "acc_y_2"       : "FLOAT",
-    "acc_z_2"       : "FLOAT",
-    "gyro_x"        : "FLOAT",
-    "gyro_y"        : "FLOAT",
-    "gyro_z"        : "FLOAT",
-    "magn_x"        : "FLOAT",
-    "magn_y"        : "FLOAT",
-    "magn_z"        : "FLOAT",
-    "PRIMARY KEY"   : "(sample_id, location)",
-    "FOREIGN KEY"   : "(sample_id) REFERENCES {}(sample_id)".format(samples_table),
-}
-sensor_readings_n_columns = len(sensor_readings_schema) - 2
+sensor_readings_table = "__".join([DATASET_NAME, "sensor_readings"])
+sensor_readings_schema = OrderedDict(
+    [
+        ("sample_id",   "INTEGER PRIMARY KEY"),
+        ("heart_rate",  "INTEGER"),
+    ] +
+    [
+        (k, "FLOAT") for k in 
+        mul_str_arr(
+            ["hand", "chest", "ankle"],
+            ["temperature"] +
+            mul_str_arr(["acc", "gyro", "magn"], ["x","y","z"])
+        )
+    ] + 
+    [("FOREIGN KEY", "(sample_id) REFERENCES {}(sample_id)".format(samples_table))]
+)
+sensor_readings_n_columns = len(sensor_readings_schema) - 1
 
 # column_headings = [
 #     "timestamp",
@@ -117,14 +108,10 @@ def row_generator(tbls_lst, index=1):
 
 def samples_from_row(index, subject_id, row):
     # row[0] , timestamp, is of type Decimal
-    return (index, str(row[0]), subject_id, row[1], row[2])
+    return (index, str(row[0]), subject_id, row[1])
 
 def sensor_readings_from_row(index, subject_id, row):
-    return [
-        (index, Location.HAND.value, *row[3:16]),
-        (index, Location.CHEST.value, *row[20:33]),
-        (index, Location.ANKLE.value, *row[37:50]),
-    ]
+    return (index, *row[2:7], *row[10:16], *row[20:24], *row[27:33], *row[37:41], *row[44:50])
 
 def check_sqlite_table_not_exists(cur):
     return ((not sqlite_util.check_sql_table_exists(cur, samples_table)) and
@@ -140,8 +127,7 @@ def store_dataset_to_sql(cur, tbls_lst):
     
         for row in row_generator(tbls_lst):
             cur.execute(_sql_stmt_samples, samples_from_row(*row))
-            for val in sensor_readings_from_row(*row):
-                cur.execute(_sql_stmt_sensors, val)
+            cur.execute(_sql_stmt_sensors, sensor_readings_from_row(*row))
         cur.execute("COMMIT TRANSACTION")
     except:
         cur.execute("ROLLBACK TRANSACTION")
