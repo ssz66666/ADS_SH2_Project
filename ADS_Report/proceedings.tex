@@ -1,0 +1,282 @@
+\documentclass{sigchi}
+
+% Use this section to set the ACM copyright statement (e.g. for
+% preprints).  Consult the conference website for the camera-ready
+% copyright statement.
+
+% Copyright
+% \CopyrightYear{2016}
+%\setcopyright{acmcopyright}
+% \setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\setcopyright{usgov}
+%\setcopyright{usgovmixed}
+%\setcopyright{cagov}
+%\setcopyright{cagovmixed}
+% DOI
+% \doi{http://dx.doi.org/10.475/123_4}
+% ISBN
+% \isbn{123-4567-24-567/08/06}
+%Conference
+% \conferenceinfo{CHI'16,}{May 07--12, 2016, San Jose, CA, USA}
+%Price
+% \acmPrice{\$15.00}
+
+% \CopyrightYear{2016}
+% \setcopyright{acmlicensed}
+% \doi{http://dx.doi.org/10.475/123_4}
+% \isbn{123-4567-24-567/08/06}
+% \conferenceinfo{CHI'16,}{May 07--12, 2016, San Jose, CA, USA}
+% \acmPrice{\$15.00}
+
+% Use this command to override the default ACM copyright statement
+% (e.g. for preprints).  Consult the conference website for the
+% camera-ready copyright statement.
+
+%% HOW TO OVERRIDE THE DEFAULT COPYRIGHT STRIP --
+%% Please note you need to make sure the copy for your specific
+%% license is used here!
+% \toappear{
+% Permission to make digital or hard copies of all or part of this work
+% for personal or classroom use is granted without fee provided that
+% copies are not made or distributed for profit or commercial advantage
+% and that copies bear this notice and the full citation on the first
+% page. Copyrights for components of this work owned by others than ACM
+% must be honored. Abstracting with credit is permitted. To copy
+% otherwise, or republish, to post on servers or to redistribute to
+% lists, requires prior specific permission and/or a fee. Request
+% permissions from \href{mailto:Permissions@acm.org}{Permissions@acm.org}. \\
+% \emph{CHI '16},  May 07--12, 2016, San Jose, CA, USA \\
+% ACM xxx-x-xxxx-xxxx-x/xx/xx\ldots \$15.00 \\
+% DOI: \url{http://dx.doi.org/xx.xxxx/xxxxxxx.xxxxxxx}
+% }
+
+% Arabic page numbers for submission.  Remove this line to eliminate
+% page numbers for the camera ready copy
+\pagenumbering{arabic}
+
+% Load basic packages
+\usepackage{balance}       % to better equalize the last page
+\usepackage{graphics}      % for EPS, load graphicx instead
+\usepackage[T1]{fontenc}   % for umlauts and other diaeresis
+\usepackage{txfonts}
+\usepackage{mathptmx}
+\usepackage[pdflang={en-US},pdftex]{hyperref}
+\usepackage{color}
+\usepackage{booktabs}
+\usepackage{textcomp}
+\usepackage{multirow}
+
+% Some optional stuff you might like/need.
+\usepackage{microtype}        % Improved Tracking and Kerning
+% \usepackage[all]{hypcap}    % Fixes bug in hyperref caption linking
+\usepackage{ccicons}          % Cite your images correctly!
+% \usepackage[utf8]{inputenc} % for a UTF8 editor only
+
+% If you want to use todo notes, marginpars etc. during creation of
+% your draft document, you have to enable the "chi_draft" option for
+% the document class. To do this, change the very first line to:
+% "\documentclass[chi_draft]{sigchi}". You can then place todo notes
+% by using the "\todo{...}"  command. Make sure to disable the draft
+% option again before submitting your final document.
+\usepackage{todonotes}
+
+% Paper metadata (use plain text, for PDF inclusion and later
+% re-using, if desired).  Use \emtpyauthor when submitting for review
+% so you remain anonymous.
+\def\plaintitle{}
+\def\plainauthor{First Author, Second Author, Third Author,
+  Fourth Author, Fifth Author, Sixth Author}
+\def\emptyauthor{}
+\def\plainkeywords{Authors' choice; of terms; separated; by
+  semicolons; include commas, within terms only; required.}
+\def\plaingeneralterms{Documentation, Standardization}
+
+% llt: Define a global style for URLs, rather that the default one
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{
+    \def\UrlFont{\sf}
+  }{
+    \def\UrlFont{\small\bf\ttfamily}
+  }}
+\makeatother
+\urlstyle{leo}
+
+% To make various LaTeX processors do the right thing with page size.
+\def\pprw{8.5in}
+\def\pprh{11in}
+\special{papersize=\pprw,\pprh}
+\setlength{\paperwidth}{\pprw}
+\setlength{\paperheight}{\pprh}
+\setlength{\pdfpagewidth}{\pprw}
+\setlength{\pdfpageheight}{\pprh}
+
+% Make sure hyperref comes last of your loaded packages, to give it a
+% fighting chance of not being over-written, since its job is to
+% redefine many LaTeX commands.
+\definecolor{linkColor}{RGB}{6,125,233}
+\hypersetup{%
+  pdftitle={\plaintitle},
+% Use \plainauthor for final version.
+%  pdfauthor={\plainauthor},
+  pdfauthor={\emptyauthor},
+  pdfkeywords={\plainkeywords},
+  pdfdisplaydoctitle=true, % For Accessibility
+  bookmarksnumbered,
+  pdfstartview={FitH},
+  colorlinks,
+  citecolor=black,
+  filecolor=black,
+  linkcolor=black,
+  urlcolor=linkColor,
+  breaklinks=true,
+  hypertexnames=false
+}
+
+% create a shortcut to typeset table headings
+% \newcommand\tabhead[1]{\small\textbf{#1}}
+
+% End of preamble. Here it comes the document.
+\makeatletter
+\def\@copyrightspace{\relax}
+\makeatother
+
+\begin{document}
+
+\title{\plaintitle}
+
+\numberofauthors{3}
+% \author{%
+%   \alignauthor{Siyu Han\\
+%     \affaddr{University of Bristol}\\
+%     \affaddr{Bristol, UK}\\
+%     \email{ec18242@bristol.ac.uk}}\\
+% }
+
+\maketitle
+
+% \begin{abstract}
+%   UPDATED---\today. This sample paper describes the formatting
+%   requirements for SIGCHI conference proceedings, and offers
+%   recommendations on writing for the worldwide SIGCHI
+%   readership. Please review this document even if you have submitted
+%   to SIGCHI conferences before, as some format details have changed
+%   relative to previous years. Abstracts should be about 150 words and
+%   are required.
+% \end{abstract}
+%
+% \category{H.5.m.}{Information Interfaces and Presentation
+%   (e.g. HCI)}{Miscellaneous} \category{See
+%   \url{http://acm.org/about/class/1998/} for the full list of ACM
+%   classifiers. This section is required.}{}{}
+%
+% \keywords{\plainkeywords}
+
+Raw Bias (RBias), has a similar form Mean Absolute Error (MAE):
+\begin{equation}
+    \text{RBias} = \frac{1}{n}\sum_{i=1}^{n}|\hat{Q} - Q}|
+\end{equation}
+
+Percent Bias (PBias):
+\begin{equation}
+    \text{PBias} = \frac{1}{n}\sum_{i=1}^{n}|(\hat{Q} - Q})/Q| \times 100
+\end{equation}
+
+
+Root Mean Square Error (RMSE)
+\begin{equation}
+    \text{RMSE} = \sqrt{\frac{1}{n}\sum_{i=1}^{n}{(\hat{Q} - Q})^2}}
+\end{equation}
+where $Q$ is missing values, $\hat{Q}$ is the corresponding predicted values, and $n$ is the count of missing values.
+
+
+\begin{table}[t]
+    \centering
+    \begin{tabular}{lrrrrrr}\toprule
+        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{IMU hand}} & \multicolumn{2}{c}{\textbf{IMU chest}} & \multicolumn{2}{c}{\textbf{IMU ankle}}\\
+        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7}
+        & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} & \emph{Count} & \emph{\%} \\ \midrule
+        1 & 1454 & 0.39 & 509 & 0.14 & 1327 & 0.35 \\
+        2 & 2729 & 0.61 & 387 & 0.09 & 2445 & 0.55 \\
+        3 & 522  & 0.21 & 183 & 0.07 & 527  & 0.21 \\
+        4 & 2214 & 0.67 & 213 & 0.06 & 1101 & 0.33 \\
+        5 & 1541 & 0.41 & 312 & 0.08 & 1980 & 0.53 \\
+        6 & 1021 & 0.28 & 343 & 0.09 & 1372 & 0.38 \\
+        7 & 1506 & 0.48 & 257 & 0.08 & 1037 & 0.33 \\
+        8 & 2151 & 0.53 & 1308 & 0.32 & 1951 & 0.48 \\ \bottomrule
+    \end{tabular}
+    \caption{The count and percentage of missing values in PAMAP2.}~\label{NA_PAMAP2}
+\end{table}
+
+\begin{table*}[t]
+    \centering
+    \begin{tabular}{lrrrrrrrr}\toprule
+        \multirow{2}{*}{\textbf{Subject}} & \multicolumn{2}{c}{\textbf{Mean}} & \multicolumn{2}{c}{\textbf{Sample}} & \multicolumn{2}{c}{\textbf{LOCF}} & \multicolumn{2}{c}{\textbf{PMM}}\\
+        \cmidrule(r){2-3} \cmidrule(r){4-5} \cmidrule(r){6-7} \cmidrule(r){8-9}
+        & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} & \emph{RBias} & \emph{RMSE} \\ \midrule
+        1 &   7.949 & 15.723 &  11.163 & 22.291 &	0.431   &   1.737	& 6.231 & 13.144 \\
+        2 &   5.238 &  9.932 &   7.422 & 14.038 &	0.338	&	1.315	& 4.171 & 8.593 \\
+        3 &   4.757 &  8.909 &   6.709 & 12.623 &	0.289	&	0.991	& 3.605 & 7.537 \\
+        4 &   5.367 & 10.467 &   7.633 & 14.759 &	0.299	&	0.856	& 4.192 & 8.720 \\
+        5 &   5.457 & 10.692 &   7.783 & 15.119 &	0.387	&	1.471	& 4.637 & 9.510 \\
+        6 &   5.438 & 10.286 &   7.683 & 14.503 &	0.432	&	1.923	& 4.555 & 9.121 \\
+        7 &   5.396 & 10.391 &   7.657 & 14.735 &	0.372	&	1.764	& 3.919 & 8.256 \\
+        8 &   5.315 & 10.091 &   7.537 & 14.288 &	0.377	&	1.741	& 4.094 & 8.223 \\ \bottomrule
+    \end{tabular}
+    \caption{Evaluation of different imputation methods on PAMAP2 dataset.}~\label{EvaluationImputation}
+\end{table}
+
+\begin{equation}
+    X_{e}[k] = \sum_{n = 0}^{N - 1}{X_{e}[n] e^{-j\frac{2\pi kn}{N}}} , \quad
+    S_{e}[k] = |X_{e}[k]|^{2} .
+\end{equation}
+
+\begin{equation}
+    \overline{E} = \frac{\sum_{k = 0}^{N - 1}{S_{e}[k]}}{N} ,\quad
+    \text{SNR} = \frac{S_{e}[\frac{N}{3}]}{\overline{E}} .
+% \vspace*{-8pt}
+\end{equation}
+
+% Balancing columns in a ref list is a bit of a pain because you
+% either use a hack like flushend or balance, or manually insert
+% a column break.  http://www.tex.ac.uk/cgi-bin/texfaq2html?label=balance
+% multicols doesn't work because we're already in two-column mode,
+% and flushend isn't awesome, so I choose balance.  See this
+% for more info: http://cs.brown.edu/system/software/latex/doc/balance.pdf
+%
+% Note that in a perfect world balance wants to be in the first
+% column of the last page.
+%
+% If balance doesn't work for you, you can remove that and
+% hard-code a column break into the bbl file right before you
+% submit:
+%
+% http://stackoverflow.com/questions/2149854/how-to-manually-equalize-columns-
+% in-an-ieee-paper-if-using-bibtex
+%
+% Or, just remove \balance and give up on balancing the last page.
+%
+%\balance{}
+
+% \section{References Format}
+
+
+% BALANCE COLUMNS
+%\balance{}
+
+% REFERENCES FORMAT
+% References must be the same font size as other body text.
+% \bibliographystyle{SIGCHI-Reference-Format}
+% \bibliography{sample}
+
+% \section{Gannt Chart}
+
+% \section{Risk Analysis}
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:
