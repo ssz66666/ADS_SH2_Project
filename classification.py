@@ -34,7 +34,7 @@ def plot_confusion_matrix(y_true, y_pred, classes,
     # Compute confusion matrix
     cm = confusion_matrix(y_true, y_pred)
     # Only use the labels that appear in the data
-    classes = classes[sklearn.utils.multiclass.unique_labels(y_true, y_pred)]
+    # classes = classes[sklearn.utils.multiclass.unique_labels(y_true, y_pred)]
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
         print("Normalized confusion matrix")
@@ -76,6 +76,8 @@ def main():
         sliding_windows = uci_mhealth.to_sliding_windows(conn)
         subject_ids = uci_mhealth.get_subject_ids(conn)
         activity_ids = uci_mhealth.get_activity_ids(conn)
+    if activity_ids is None:
+        raise ValueError("WTF")
     features = extract_features(sliding_windows, all_feature)
     n_subs = len(subject_ids)
     n_training = round(n_subs * TRAINING_SET_PROPORTION)
@@ -86,9 +88,18 @@ def main():
     test_set = features[np.logical_not(idx)]
     train_X, train_y = uci_mhealth.to_classification(training_set)
     test_X, test_y = uci_mhealth.to_classification(test_set)
+    print("training set:", np.shape(train_X))
+    print("test set:", np.shape(test_X))
+
     clsf = RandomForestClassifier(n_estimators=500, class_weight="balanced", n_jobs=-1)
     clsf.fit(train_X,train_y)
     RF_pred = clsf.predict(test_X)
+    test_y = list(map(lambda x: int(x), test_y))
+    RF_pred = list(map(lambda x: int(x), RF_pred))
+    np.savetxt("predicts.txt", RF_pred)
+    print(activity_ids)
+    activity_ids.sort()
+    activity_ids = list(map(lambda x: str(x), activity_ids))[1:]
     plot_confusion_matrix(test_y, RF_pred, activity_ids)
     plt.savefig("{}_result.png".format(dt.now().strftime("%Y%m%d-%H-%M-%S")))
 

@@ -10,6 +10,11 @@
 
 raw_dataset/*
 
+# results
+input_features.csv
+predicts.txt
+*_result.png
+
 ### LaTeX ###
 ## Core latex/pdflatex auxiliary files:
 *.aux

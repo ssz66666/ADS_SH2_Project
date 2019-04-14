@@ -25,7 +25,7 @@ SELECT
                 ["x", "y", "z"])) + """
 FROM
     {0}, {1}
-WHERE {0}.sample_id = {1}.sample_id AND subject_id = ?;
+WHERE {0}.sample_id = {1}.sample_id AND activity_id != 0 AND subject_id = ?;
 """).format(samples_table, sensor_readings_table)
 
 raw_table_query = ("""
@@ -49,7 +49,7 @@ def get_subject_ids(conn):
     return list(map(lambda x: int(x[0]), conn.execute(distinct_subject_query)))
     
 def get_activity_ids(conn):
-    return list(map(lambda x: int(x[0]), conn.execute(distinct_subject_query)))
+    return list(map(lambda x: int(x[0]), conn.execute(distinct_activity_query)))
 
 def to_sliding_windows(conn, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     ids = get_subject_ids(conn)
