@@ -76,39 +76,44 @@ def extract_features(df_windows,all_feature):
 
     return df_features
 
-# Connection to the DB and retrieve sliding windows
-conn = sqlite3.connect(SQLITE_DATABASE_FILE)
 
-sliding_windows_object = uci_mhealth.to_sliding_windows(conn) #.cursor(), size=100)
+def main():
+    # Connection to the DB and retrieve sliding windows
+    conn = sqlite3.connect(SQLITE_DATABASE_FILE)
 
-# Create an array with the headers of the columns
-sw_list =[] # sliding_windows list
+    sliding_windows_object = uci_mhealth.to_sliding_windows(conn) #.cursor(), size=100)
 
-sw_list = list(sliding_windows_object)
+    # Create an array with the headers of the columns
+    # sw_list =[] # sliding_windows list
 
-''' For debugging
-for i in sw_list:
-    for j in i:
-        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-            print(j)
-exit(0)
-'''
+    # sw_list = list(sliding_windows_object)
 
-'''
-column_headers = []
-for i in sw_list:
-    for j in i:
-        column_headers = j.columns.values
+    ''' For debugging
+    for i in sw_list:
+        for j in i:
+            with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+                print(j)
+    exit(0)
+    '''
 
-no_cols = len(column_headers)
-column_headers = column_headers[3:len(column_headers)]
-'''
+    '''
+    column_headers = []
+    for i in sw_list:
+        for j in i:
+            column_headers = j.columns.values
+
+    no_cols = len(column_headers)
+    column_headers = column_headers[3:len(column_headers)]
+    '''
 
 
-all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quantile_5','fft_quantile_1',
-                'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
-features = extract_features(sw_list,all_feature)
+    all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quantile_5','fft_quantile_1',
+                    'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
+    features = extract_features(sliding_windows_object,all_feature)
 
-features.to_csv('input_features.txt', header=features.columns.values, index=False, sep='\t', mode='w')
-#with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-#    print(features)
+    features.to_csv('input_features.csv', header=features.columns.values, index=False, sep='\t', mode='w')
+    #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    #    print(features)
+
+if __name__ == "__main__":
+    main()
