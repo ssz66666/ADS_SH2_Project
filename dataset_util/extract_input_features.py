@@ -23,8 +23,8 @@ def extract_features(df_windows,all_feature):
                 column_headers = column_headers[3:len(column_headers)]
                 check = 1
 
-            print(df_window['activity_id'].value_counts().idxmax())
-            print(df_window['subject_id'].iloc[0])
+            #print(df_window['activity_id'].value_counts().idxmax()," ",df_window['subject_id'].iloc[0])
+
             features.append(df_window['activity_id'].value_counts().idxmax()) # to find the most frequent value in the activity_id col
             features.append(df_window['subject_id'].iloc[0])
 
@@ -79,7 +79,7 @@ def extract_features(df_windows,all_feature):
 # Connection to the DB and retrieve sliding windows
 conn = sqlite3.connect(SQLITE_DATABASE_FILE)
 
-sliding_windows_object = uci_mhealth.to_sliding_windows(conn.cursor(), size=100)
+sliding_windows_object = uci_mhealth.to_sliding_windows(conn) #.cursor(), size=100)
 
 # Create an array with the headers of the columns
 sw_list =[] # sliding_windows list
@@ -91,7 +91,9 @@ for i in sw_list:
     for j in i:
         with pd.option_context('display.max_rows', None, 'display.max_columns', None):
             print(j)
+exit(0)
 '''
+
 '''
 column_headers = []
 for i in sw_list:
@@ -107,6 +109,6 @@ all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quan
                 'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
 features = extract_features(sw_list,all_feature)
 
-#features.to_csv('input_features.txt', header=features.columns.values, index=False, sep='\t', mode='a')
+features.to_csv('input_features.txt', header=features.columns.values, index=False, sep='\t', mode='w')
 #with pd.option_context('display.max_rows', None, 'display.max_columns', None):
 #    print(features)
