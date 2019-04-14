@@ -266,7 +266,7 @@ ggplot2::ggplot(data = NaProp, aes(x = label, y = Freq)) +
 
 getSubset <- function(inputDataset, parallel.cores = 20) {
         cl <- parallel::makeCluster(parallel.cores)
-        parallel::clusterExport(cl, varlist = "inputDataset")
+        parallel::clusterExport(cl, varlist = "inputDataset", envir = environment())
         datasetIdx <- parallel::parSapply(cl, 1:nrow(inputDataset), function(x) {
                 flagNA <- !anyNA(inputDataset[x,])
                 flagNA
@@ -312,6 +312,10 @@ imputateDatasets_pmm <- parallel::parLapply(cl, ls(pattern = "NA_subset2_dataset
 imputateDatasets_sample <- parallel::parLapply(cl, ls(pattern = "NA_subset2_dataset"), imputeteDataset, method = "sample")
 imputateDatasets_mean <- parallel::parLapply(cl, ls(pattern = "NA_subset2_dataset"), imputeteDataset, method = "mean")
 
+save(imputateDatasets_pmm, file = "imputedSubset_test_pmm.RData")
+save(imputateDatasets_sample, file = "imputedSubset_test_sample.RData")
+save(imputateDatasets_mean, file = "imputedSubset_test_mean.RData")
+
 
 imputeLOCF <- function(datasetWithNA, datasetNoNA) {
         imputedDataset <- tidyr::fill(data = datasetWithNA, 1:ncol(datasetWithNA))
@@ -335,7 +339,7 @@ imputeLOCF <- function(datasetWithNA, datasetNoNA) {
         output
 }
 
-for (i in 1:8) {
+for(i in 1:8) {
         datasetWithNA <- get(paste0("NA_subset2_dataset", i))
         datasetNoNA   <- get(paste0("subset2_dataset", i))
         
@@ -346,3 +350,161 @@ for (i in 1:8) {
 rm(datasetWithNA, datasetNoNA, tmpDataset)
 save(list = ls(pattern = "imputeData"), file = "imputedSubset_test_LOCF.RData")
 
+evaluateImputation <- function(imputedDataset, datasetWithNA, datasetNoNA) {
+        dataNA <- unlist(datasetWithNA)
+        idxNAs <- which(is.na(dataNA))
+        numNAs <- length(idxNAs)
+        
+        dataPred <- unlist(imputedDataset)
+        dataRef <- unlist(datasetNoNA)
+        
+        dataTmp <- dataPred - dataRef
+        
+        RMSE <- sqrt(sum(dataTmp ^ 2)/numNAs)
+        # PBIAS <- sum(abs(dataTmp / dataRef * 100))/numNAs
+        RBIAS <- sum(abs(dataTmp))/numNAs
+        
+        message("RBIAS: ", round(RBIAS, 3), " & ", round(RMSE, 3), " :RMSE")
+        
+        output <- c(RBIAS = RBIAS, RMSE = RMSE)
+        output
+}
+
+for(i in 1:8) {
+        NA_subset2_dataset <- get(paste0("NA_subset2_dataset", i))
+        subset2_dataset <- get(paste0("subset2_dataset", i))
+        imputedDataset <- get(ls(pattern = "imputate"))
+        res <- evaluateImputation(imputedDataset = imputedDataset[[i]][,12:41], 
+                                  datasetWithNA = NA_subset2_dataset[,12:41], 
+                                  datasetNoNA = subset2_dataset[,12:41])
+}
+
+interpolationNA <- function(NAdataset, Refdataset = NULL) {
+        bakDataset <- NAdataset
+        for(j in 1:length(NAdataset)){
+                # cat(j, sep = " ")
+                if(is.na(NAdataset[[j]][[1]])) NAdataset[[j]][[1]] <- NAdataset[[j]][which(!is.na(NAdataset[[j]]))[1]]
+                if(is.na(tail(NAdataset[[j]], 1))) {
+                        NAdataset[[j]][[tail(NAdataset[[j]], 1)]] <- NAdataset[[j]][rev(which(!is.na(NAdataset[[j]])))[1]]
+                }
+                NAdataset[[j]] <- zoo::na.approx(NAdataset[[j]])
+        }
+        
+        if(is.null(Refdataset)) {
+                return(NAdataset)
+        } else {
+                res <- evaluateImputation(NAdataset, bakDataset, Refdataset)
+                return(res)
+        }
+}
+
+csInterpolating <- function(inputDataset) {
+        
+        newDataset <- interpolationNA(inputDataset[,12:41])
+        newDataset <- cbind(inputDataset[,1:11], newDataset)
+        
+        # subset <- getSubset(newDataset, 20)
+        # NAdataset <- subset
+        # NAdataset$HR[sample(nrow(NAdataset), floor(0.5 * nrow(NAdataset)))] <- NA
+        # datasetWithNA <- NAdataset
+        # 
+        # if(is.na(NAdataset$HR[1])) NAdataset$HR[1] <- NAdataset$HR[which(!is.na(NAdataset$HR))[1]]
+        # if(is.na(tail(NAdataset$HR, 1))) NAdataset$HR[length(NAdataset$HR)] <- NAdataset$HR[rev(which(!is.na(NAdataset$HR)))[1]]
+
+        # NAdataset$HR[is.na(NAdataset$HR)] <- stats::spline(NAdataset$timeStamp, NAdataset$HR, n = length(NAdataset$HR), method = "natural")$y[is.na(NAdataset$HR)]
+        
+        # res <- evaluateImputation(imputedDataset = NAdataset$HR, datasetWithNA = datasetWithNA$HR, datasetNoNA = subset$HR)
+        # print(res)
+        # res
+        idxNA <- is.na(newDataset$HR)
+        newDataset$HR[idxNA] <- stats::spline(newDataset$timeStamp, 
+                                              newDataset$HR, n = length(idxNA), 
+                                              method = "natural")$y[idxNA]
+        newDataset
+}
+
+for(i in 1:8){
+        inputDataset <- get(paste0("dataset", i))
+        imputedDataset <- csInterpolating(inputDataset)
+        imputedDataset <- imputedDataset[imputedDataset$activity != 0,]
+        write.csv(imputedDataset, file = paste0("imputedPAMAP2_", i, ".csv"))
+        assign(paste0("imputedDataset_v3_", i), imputedDataset)
+}
+
+function(inputDataset) {
+        inputDataset <- inputDataset[,-c(1:10)]
+        inputDatasetRandom <- inputDataset[sample(nrow(inputDataset)),]
+        idx <- round(seq(nrow(inputDatasetRandom), 1, length.out = 11))
+        perf <- data.frame()
+        for(i in 1:10) {
+                testSetIDX <- idx[i]:idx[(i + 1)]
+                testSet <- inputDatasetRandom[testSetIDX,]
+                trainSet <- inputDatasetRandom[-testSetIDX,]
+                
+                model <- caret::train(
+                        HR ~., data = trainSet, method = "glmnet",
+                        trControl = caret::trainControl("cv", number = 10),
+                        tuneLength = 10
+                )
+                
+                Res <- predict(model, testSet)
+                
+                dataTmp <- Res - testSet$HR
+                RMSE <- sqrt(sum(dataTmp ^ 2)/nrow(testSet))
+                RBIAS <- sum(abs(dataTmp))/nrow(testSet)
+                message("RBIAS: ", round(RBIAS, 3), " & ", round(RMSE, 3), " :RMSE")
+                
+                res <- data.frame(RMSE = RMSE, RBIAS = RBIAS)
+                perf <- rbind(perf, res)
+        }
+        message("Final:")
+        output.perf <- colMeans(perf)
+        output.perf
+}
+
+for(num in 1:8) {
+        inputDataset <- get(paste0("dataset_v2_", num))
+        newDataset <- getSubset(inputDataset)
+        assign(paste0("dataset_v2_NoNA_", num), newDataset)
+        newDataset$HR[sample(nrow(newDataset), floor(0.5 * nrow(newDataset)))] <- NA
+        assign(paste0("dataset_v2_WithNA_", num), newDataset)
+}
+
+runGLM <- function(inputDataset) {
+        inputDataset <- inputDataset[,-c(1:10)]
+        inputDatasetRandom <- inputDataset[sample(nrow(inputDataset)),]
+        idx <- round(seq(nrow(inputDatasetRandom), 1, length.out = 11))
+        perf <- data.frame()
+        for(i in 1:10) {
+                testSetIDX <- idx[i]:idx[(i + 1)]
+                testSet <- inputDatasetRandom[testSetIDX,]
+                trainSet <- inputDatasetRandom[-testSetIDX,]
+                
+                model <- caret::train(
+                        HR ~., data = trainSet, method = "glmnet",
+                        trControl = caret::trainControl("cv", number = 10),
+                        tuneLength = 10
+                )
+                
+                Res <- predict(model, testSet)
+                
+                dataTmp <- Res - testSet$HR
+                RMSE <- sqrt(sum(dataTmp ^ 2)/nrow(testSet))
+                RBIAS <- sum(abs(dataTmp))/nrow(testSet)
+                message("RBIAS: ", round(RBIAS, 3), "RMSE: ", round(RMSE, 3))
+                print(model$bestTune)
+                
+                res <- data.frame(RMSE = RMSE, RBIAS = RBIAS)
+                perf <- rbind(perf, res)
+        }
+        message("Final:")
+        output.perf <- colMeans(perf)
+        print(output.perf)
+        output.perf
+}
+
+for(i in 1:8) {
+        message("Subj ", i)
+        inputDataset <- get(paste0("dataset_v2_NoNA_", i))
+        runGLM(inputDataset)
+}
