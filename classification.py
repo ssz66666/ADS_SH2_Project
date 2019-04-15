@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
 from plots import plot_confusion_matrix
-
+from evaluate_classification import evaluation_metrics
 
 
 def main():
@@ -26,19 +26,25 @@ def main():
     n_training = round(n_subs * TRAINING_SET_PROPORTION)
     # n_test = n_subs - n_training
     idx = np.isin(features.loc[:,"subject_id"], subject_ids[:n_training])
-    print("Moved on")
+
     training_set = features[idx]
     test_set = features[np.logical_not(idx)]
     train_X, train_y = uci_mhealth.to_classification(training_set)
     test_X, test_y = uci_mhealth.to_classification(test_set)
-    print("training set:", np.shape(train_X))
-    print("test set:", np.shape(test_X))
+    #print("training set:", np.shape(train_X))
+    #print("test set:", np.shape(test_X))
 
     clsf = RandomForestClassifier(n_estimators=500, class_weight="balanced", n_jobs=-1)
     clsf.fit(train_X,train_y)
     RF_pred = clsf.predict(test_X)
     test_y = list(map(lambda x: int(x), test_y))
     RF_pred = list(map(lambda x: int(x), RF_pred))
+
+    evaluation_metrics(test_y,RF_pred)
+
+    exit(0)
+
+
     # np.savetxt("predicts.txt", RF_pred)
     print(activity_ids)
     activity_ids.sort()
