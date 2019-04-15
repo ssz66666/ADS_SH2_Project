@@ -42,9 +42,6 @@ def main():
 
     evaluation_metrics(test_y,RF_pred)
 
-    exit(0)
-
-
     # np.savetxt("predicts.txt", RF_pred)
     print(activity_ids)
     activity_ids.sort()
