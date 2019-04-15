@@ -8,7 +8,7 @@ DEFAULT_WINDOW_SIZE = 100
 DEFAULT_WINDOW_OVERLAP = 0
 
 def query_to_sliding_windows(cur, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
-    return to_sliding_windows(cur, list(map(lambda x: x[0], cur.description)), size, overlap)
+    return to_sliding_windows(cur, list(map(lambda x: x[0], cur.description)), size=size, overlap=overlap)
 
 def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     if size <= overlap:

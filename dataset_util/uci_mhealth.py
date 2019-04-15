@@ -70,4 +70,4 @@ def to_sliding_windows(conn, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OV
     for subject_id in ids:
         yield preprocess.query_to_sliding_windows(conn.execute(
             raw_table_valid_data_query_with_subject_id, (subject_id,)
-        ), size, overlap)
+        ), size=size, overlap=overlap)
