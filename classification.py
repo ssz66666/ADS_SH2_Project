@@ -43,7 +43,7 @@ def main():
     evaluation_metrics(test_y,RF_pred)
 
     # np.savetxt("predicts.txt", RF_pred)
-    print(activity_ids)
+    #print(activity_ids)
     activity_ids.sort()
     activity_ids = list(map(lambda x: str(x), activity_ids))[1:]
     plot_confusion_matrix(test_y, RF_pred, activity_ids)
