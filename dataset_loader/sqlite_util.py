@@ -18,11 +18,14 @@ def build_schema(schema):
     schema_str = '(' + ('{} {},' * ((len(vals) - 1) // 2)) + '{} {})' 
     return schema_str.format(*vals)
 
+def drop_table_if_exists(cur, table_name):
+    cur.execute("DROP TABLE IF EXISTS {};".format(table_name))
+
 def create_table_if_not_exists(cur, table_name, schema):
     create_table_if_not_exists_raw_schema(cur, table_name, build_schema(schema))
 
 def create_table_if_not_exists_raw_schema(cur, table_name, schema_string):
-    cur.execute("CREATE TABLE IF NOT EXISTS {} {}".format(table_name, schema_string))
+    cur.execute("CREATE TABLE IF NOT EXISTS {} {};".format(table_name, schema_string))
 
 def check_sql_table_exists(cur, table_name):
     return cur.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?;", (table_name,)).fetchone() is not None
