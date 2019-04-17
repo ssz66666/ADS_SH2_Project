@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
-from plots import plot_confusion_matrix
-
+from scikitplot.metrics import plot_confusion_matrix, plot_roc
+from evaluate_classification import evaluation_metrics
 
 
 def main():
@@ -26,25 +26,31 @@ def main():
     n_training = round(n_subs * TRAINING_SET_PROPORTION)
     # n_test = n_subs - n_training
     idx = np.isin(features.loc[:,"subject_id"], subject_ids[:n_training])
-    print("Moved on")
+
     training_set = features[idx]
     test_set = features[np.logical_not(idx)]
     train_X, train_y = uci_mhealth.to_classification(training_set)
     test_X, test_y = uci_mhealth.to_classification(test_set)
-    print("training set:", np.shape(train_X))
-    print("test set:", np.shape(test_X))
+    #print("training set:", np.shape(train_X))
+    #print("test set:", np.shape(test_X))
 
     clsf = RandomForestClassifier(n_estimators=500, class_weight="balanced", n_jobs=-1)
     clsf.fit(train_X,train_y)
     RF_pred = clsf.predict(test_X)
-    test_y = list(map(lambda x: int(x), test_y))
-    RF_pred = list(map(lambda x: int(x), RF_pred))
-    # np.savetxt("predicts.txt", RF_pred)
-    print(activity_ids)
+    pred_probability = clsf.predict_proba(test_X)
     activity_ids.sort()
-    activity_ids = list(map(lambda x: str(x), activity_ids))[1:]
-    plot_confusion_matrix(test_y, RF_pred, activity_ids)
-    plt.savefig("{}_result.png".format(dt.now().strftime("%Y%m%d-%H-%M-%S")))
+
+    evaluation_metrics(test_y,RF_pred, pred_probability)
+
+    # np.savetxt("predicts.txt", RF_pred)
+    # print(activity_ids)
+
+    # make plots
+    _now = dt.now().strftime("%Y%m%d-%H-%M-%S")
+    plot_confusion_matrix(test_y, RF_pred)
+    plt.savefig("{}_result.png".format(_now))
+    plot_roc(test_y, pred_probability)
+    plt.savefig("{}_roc_result.png".format(_now))
 
 # testset = sklearn.model_selection.train_test_split(dataset, test_size = 0.2, random_state = 1, stratify = dataset.iloc[:,1])
         
