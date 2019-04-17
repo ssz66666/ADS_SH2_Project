@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
-from plots import plot_confusion_matrix
+from scikitplot.metrics import plot_confusion_matrix
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
