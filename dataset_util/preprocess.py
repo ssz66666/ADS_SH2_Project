@@ -31,6 +31,12 @@ def to_sliding_windows_cursor(cur, col_headings=None, size=DEFAULT_WINDOW_SIZE, 
 def to_classification(df):
     return df.iloc[:,2:], df.iloc[:,0], df.iloc[:,1]
 
+def full_df_to_sliding_windows(df, **kwargs):
+    subject_ids = np.unique(df.loc[:,"subject_id"])
+    for sid in subject_ids:
+        df_subject = df.loc[df["subject_id"] == sid]
+        yield to_sliding_windows(df_subject.values, col_headings=df.columns, **kwargs)
+
 def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     if size <= overlap:
         raise ValueError("size must be strictly greater than overlap")
