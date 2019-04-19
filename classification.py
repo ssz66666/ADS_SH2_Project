@@ -5,7 +5,7 @@ import sqlite3
 
 from datetime import datetime as dt
 
-from dataset_util import uci_mhealth
+from dataset_util import preprocess, uci_mhealth
 from dataset_util.extract_input_features import all_feature, extract_features
 import matplotlib.pyplot as plt
 
@@ -13,14 +13,26 @@ import numpy as np
 from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
 from scikitplot.metrics import plot_confusion_matrix, plot_roc
 from evaluate_classification import evaluation_metrics
+from cross_validation import cross_validate_multiclass_group_kfold
 
+def cv_main():
+    with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
+        # features = pd.read_sql_query(uci_mhealth.raw_table_valid_data_query, conn)
+        sliding_windows = uci_mhealth.to_sliding_windows(conn)
+    features = extract_features(sliding_windows, all_feature)
+    clsf = RandomForestClassifier(n_estimators=500, class_weight="balanced", n_jobs=-1)
+
+    result = cross_validate_multiclass_group_kfold(clsf, *preprocess.to_classification(features), n_splits=5)
+    mean_result = { m : np.mean(v) for (m,v) in result.items()}
+    for p in mean_result.items():
+        print(p)
+        
 
 def main():
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         # features = pd.read_sql_query(uci_mhealth.raw_table_valid_data_query, conn)
         sliding_windows = uci_mhealth.to_sliding_windows(conn)
         subject_ids = uci_mhealth.get_subject_ids(conn)
-        activity_ids = uci_mhealth.get_activity_ids(conn)
     features = extract_features(sliding_windows, all_feature)
     n_subs = len(subject_ids)
     n_training = round(n_subs * TRAINING_SET_PROPORTION)
@@ -38,7 +50,6 @@ def main():
     clsf.fit(train_X,train_y)
     RF_pred = clsf.predict(test_X)
     pred_probability = clsf.predict_proba(test_X)
-    activity_ids.sort()
 
     evaluation_metrics(test_y,RF_pred, pred_probability)
 
@@ -55,4 +66,5 @@ def main():
 # testset = sklearn.model_selection.train_test_split(dataset, test_size = 0.2, random_state = 1, stratify = dataset.iloc[:,1])
         
 if __name__ == "__main__":
-    main()
+    # main()
+    cv_main()
