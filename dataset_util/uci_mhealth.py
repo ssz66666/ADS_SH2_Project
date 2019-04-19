@@ -57,7 +57,7 @@ WHERE {0}.sample_id = {1}.sample_id;
 """).format(samples_table, sensor_readings_table)
 
 def to_classification(df):
-    return df.iloc[:,2:], df.loc[:,"activity_id"]
+    return preprocess.to_classification(df)[0:2]
 
 def get_subject_ids(conn):
     return list(map(lambda x: int(x[0]), conn.execute(distinct_subject_query)))

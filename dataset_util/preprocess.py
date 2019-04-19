@@ -27,6 +27,10 @@ def to_sliding_windows_cursor(cur, col_headings=None, size=DEFAULT_WINDOW_SIZE, 
             yield pd.DataFrame(_arr, columns=col_headings)
     return
 
+# returns X, y, subject_id
+def to_classification(df):
+    return df.iloc[:,2:], df.iloc[:,0], df.iloc[:,1]
+
 def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overlap=DEFAULT_WINDOW_OVERLAP):
     if size <= overlap:
         raise ValueError("size must be strictly greater than overlap")

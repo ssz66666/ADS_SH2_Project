@@ -1,6 +1,6 @@
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.preprocessing import label_binarize
-from sklearn.metrics import confusion_matrix, roc_curve, auc
+from sklearn.metrics import confusion_matrix, roc_curve, auc, make_scorer
 import sklearn.utils.multiclass
 import numpy as np
 from scipy import interp
@@ -53,7 +53,11 @@ def calculate_sensitivity_specificity(targets,predictions,classes):
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-def get_roc_auc(y_true, pred_proba):
+def get_roc_auc(y_true, pred_proba, kls_label=None, kls_idx=None):
+    if kls_idx is not None:
+        fpr, tpr, _ = roc_curve(y_true, pred_proba[:, kls_idx],
+            pos_label=kls_label)
+        return auc(fpr, tpr)
     classes = np.unique(y_true)
     fpr_dict = {}
     tpr_dict = {}
@@ -84,6 +88,28 @@ def get_roc_auc(y_true, pred_proba):
     macro_auc = auc(all_fpr, mean_tpr)
     
     return auc_dict, micro_auc, macro_auc
+
+def get_sensitivity(y, y_pred, kls_label=None, kls_idx=None):
+    cm = confusion_matrix(y == kls_label, y_pred == kls_label)
+    return cm[0,0]/(cm[0,0]+cm[0,1])
+
+def get_specificity(y, y_pred, kls_label=None, kls_idx=None):
+    cm = confusion_matrix(y == kls_label, y_pred == kls_label)
+    return cm[1,1]/(cm[1,0]+cm[1,1])
+
+def get_f1(y, y_pred, kls_label):
+    return f1_score(y, y_pred, labels=[kls_label], average=None)[0]
+
+def get_cv_scorer(classes):
+    scorer = {
+        "total_accuracy"  :   "accuracy"
+    }
+    for (kls_idx,kls) in enumerate(classes):
+        scorer["_".join(["sensitivity", str(kls)])] = make_scorer(get_sensitivity, kls_label=kls)
+        scorer["_".join(["specificity", str(kls)])] = make_scorer(get_specificity, kls_label=kls)
+        scorer["_".join(["f1_score", str(kls)])] = make_scorer(get_f1, kls_label=kls)
+        scorer["_".join(["auc", str(kls)])] = make_scorer(get_roc_auc, needs_proba=True, kls_label=kls, kls_idx=kls_idx)
+    return scorer
 
 def evaluation_metrics(targets, predictions, pred_probability, print_result=True):
 
