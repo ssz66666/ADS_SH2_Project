@@ -30,6 +30,18 @@ FROM
 WHERE {0}.sample_id = {1}.sample_id AND subject_id = ?;
 """).format(samples_table, sensor_readings_table)
 
+raw_table_query_with_subject_id_shared_data = ("""
+SELECT
+    activity_id, subject_id,
+""" +
+", ".join(mul_str_arr(["chest_acc"], ["x","y","z"]) +
+        mul_str_arr(["ankle", "hand"],["acc", "gyro", "magn"], ["x","y","z"])
+    ) + """
+FROM
+    {0}, {1}
+WHERE {0}.sample_id = {1}.sample_id AND subject_id = ?;
+""").format(samples_table, sensor_readings_table)
+
 raw_table_query = ("""
 SELECT
     activity_id, timestamp, subject_id, heart_rate,
@@ -58,4 +70,11 @@ def to_sliding_windows(conn, *args, **kwargs):
     for subject_id in ids:
         yield preprocess.query_to_sliding_windows(conn.execute(
             raw_table_query_with_subject_id, (subject_id,)
+        ), *args, **kwargs)
+
+def to_sliding_windows_shared_data(conn, *args, **kwargs):
+    ids = get_subject_ids(conn)
+    for subject_id in ids:
+        yield preprocess.query_to_sliding_windows(conn.execute(
+            raw_table_query_with_subject_id_shared_data, (subject_id,)
         ), *args, **kwargs)
