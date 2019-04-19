@@ -11,17 +11,18 @@ import datetime
 
 def change_type(row):
     row['timestamp'] = datetime.datetime.utcfromtimestamp(float(row['timestamp'])).strftime("%H:%M:%S.%f")
+
     return row
 
 
-def resample_raw_data(current_freq, required_freq, df):
+def resample_raw_data(required_freq, df):
     try:
         df = df.set_index('timestamp')
     except:
         print('Already time series')
 
     req_period = 1 / required_freq
-    df = df.resample('{}S'.format(req_period)).interpolate()
+    df = df.resample('{}S'.format(req_period)).interpolate(method='polynomial', order=3)
     return df
 
 raw_table_query = ("""
@@ -47,17 +48,20 @@ subject_id_1 = df.loc[df['subject_id'] == 1]
 #with pd.option_context('display.max_rows', None, 'display.max_columns', None):  # more options can be specified also
 #print(subject_id_1)
 
-subject_id_1 = subject_id_1.apply(change_type,axis = 1)
+#subject_id_1 = subject_id_1.apply(change_type,axis = 1)
 
-#print(subject_id_1)
+
+#print(subject_id_1["timestamp"])
+subject_id_1.loc[:,'timestamp'] = pd.TimedeltaIndex(subject_id_1.loc[:,'timestamp'], unit="s")
+#print(subject_id_1.loc[:,'timestamp'])
+
 
 subject_id_1 = subject_id_1.set_index('timestamp')
-subject_id_1.index = pd.to_datetime(df.index,format = '%M:%S.%f')
+#subject_id_1.index = pd.to_datetime(df.index,format = '%M:%S.%f')
 
+resampled = resample_raw_data(100,subject_id_1)
 
-resample_raw_data(100,subject_id_1)
-
-print(subject_id_1)
+print(resampled)
 exit(0)
 
 
