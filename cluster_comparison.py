@@ -17,6 +17,7 @@ from cross_validation import cross_validate_multiclass_group_kfold
 import os
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+from resample import resample
 
 def centroid(pc, data):
     activities = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -60,24 +61,27 @@ def activity_similarity(df, labels):
 
     return df1
 
-
-
-
-
-
 def cv_main():
     pca = PCA(n_components=2)
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
         else:
-            sliding_windows_mhealth = uci_mhealth.to_sliding_windows_shared_data(conn)
+            data = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
+            data = resample(data, 100)
+            # data = data.drop(['timestamp'], axis = 1)
+            sliding_windows_mhealth = preprocess.full_df_to_sliding_windows(data)
+            # sliding_windows_mhealth = uci_mhealth.to_sliding_windows_shared_data(conn)
             features_mhealth = extract_features(sliding_windows_mhealth, all_feature)
             features_mhealth.to_pickle('mhealth_features.pkl')
         if os.path.exists('pamap_features.pkl'):
             features_pamap = pd.read_pickle('pamap_features.pkl')
         else:
-            sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
+            data = pd.read_sql_query(uci_pamap2.raw_table_query_shared_data, conn)
+            # data = resample(data, 50)
+            data = data.drop(['timestamp'], axis = 1)
+            sliding_windows_pamap = preprocess.full_df_to_sliding_windows(data)
+            # sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
             features_pamap = extract_features(sliding_windows_pamap, all_feature)
             features_pamap.to_pickle('pamap_features.pkl')
     # features_mhealth = extract_features(sliding_windows_mhealth, all_feature)
