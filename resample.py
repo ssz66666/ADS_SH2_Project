@@ -17,7 +17,7 @@ def resample_raw_data(required_freq, df):
     df = df.resample('{}S'.format(req_period)).interpolate()#(method='polynomial', order=2)
     return df
 
-def resample(df):
+def resample(df,new_freq):
     '''
     raw_table_query = ("""
     SELECT
@@ -45,7 +45,7 @@ def resample(df):
         subject_id.loc[:, 'timestamp'] = pd.TimedeltaIndex(subject_id.loc[:, 'timestamp'], unit="s")
 
         subject_id = subject_id.set_index('timestamp')
-        resampled = resample_raw_data(100, subject_id)
+        resampled = resample_raw_data(new_freq, subject_id)
 
         dataset.append(resampled)
 
