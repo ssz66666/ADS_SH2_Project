@@ -7,17 +7,19 @@ import pandas as pd
 import numpy as np
 
 
-def resample_raw_data(required_freq, df):
+def resample_raw_data(required_freq, df, **kwargs):
     try:
         df = df.set_index('timestamp')
     except:
         print('Already time series')
 
     req_period = 1 / required_freq
-    df = df.resample('{}S'.format(req_period)).interpolate()#(method='polynomial', order=2)
-    return df
+    resampled = df.resample('{}S'.format(req_period)).asfreq()
+    resampled.index = range(len(resampled))
+    resampled_interpolated = resampled.interpolate(**kwargs)
+    return resampled_interpolated
 
-def resample(df,new_freq):
+def resample(df,new_freq, **kwargs):
     '''
     raw_table_query = ("""
     SELECT
@@ -37,16 +39,14 @@ def resample(df,new_freq):
 
     df = pd.read_sql(raw_table_query, conn)
     '''
+    df.loc[:, 'timestamp'] = pd.TimedeltaIndex(df.loc[:, 'timestamp'], unit="s")
+    df = df.set_index('timestamp')
+    
     subject_ids = np.unique(df.loc[:,"subject_id"])
     dataset = []
     for i in subject_ids:
         subject_id = df.loc[df['subject_id'] == i]
-
-        subject_id.loc[:, 'timestamp'] = pd.TimedeltaIndex(subject_id.loc[:, 'timestamp'], unit="s")
-
-        subject_id = subject_id.set_index('timestamp')
-        resampled = resample_raw_data(new_freq, subject_id)
-
+        resampled = resample_raw_data(new_freq, subject_id, **kwargs)
         dataset.append(resampled)
 
     return pd.concat(dataset)
