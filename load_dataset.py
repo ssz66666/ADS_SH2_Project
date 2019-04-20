@@ -11,6 +11,7 @@ from config import SQLITE_DATABASE_FILE, RAW_DATASET_DIR
 DATASET_LIST = [
     "uci_mhealth",
     "uci_pamap2",
+    "uci_chest_accelerometer",
 ]
 
 def load_all_datasets(conn, path, *datasets):
@@ -22,6 +23,8 @@ def load_all_datasets(conn, path, *datasets):
             if m.check_sqlite_table_not_exists(cur):
                 m.load_dataset_to_sqlite(cur, raw_path)
                 conn.commit()
+        else:
+            print("module not found for ", dataset)
 
 NEW_PAMAP2_PATH = "raw_dataset/uci_pamap2/PAMAP2_finalDataset"
 
