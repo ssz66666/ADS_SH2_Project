@@ -23,12 +23,13 @@ def centroid(pc, data):
     activities = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     centroids = []
     for j in activities:
-        meanf1 = []; meanf2 = []
+        f1 = []; f2 = []; f3 = []
         for i in range(len(data)):
             if data['activity_id'][i] == j:
-                meanf1.append(pc[i, 0])
-                meanf2.append(pc[i, 1])
-        centroids.append([np.mean(meanf1), np.mean(meanf2)])
+                f1.append(pc[i, 0])
+                f2.append(pc[i, 1])
+                f3.append(pc[i, 2])
+        centroids.append([np.median(f1), np.median(f2), np.median(f3)])
 
 
     return centroids
@@ -62,7 +63,7 @@ def activity_similarity(df, labels):
     return df1
 
 def cv_main():
-    pca = PCA(n_components=2)
+    pca = PCA(n_components=3)
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
