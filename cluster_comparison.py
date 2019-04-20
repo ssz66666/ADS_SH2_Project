@@ -62,14 +62,36 @@ def activity_similarity(df, labels):
 
     return df1
 
+def deg2rad(data):
+    for i in data.columns:
+        if 'gyro' in i:
+            temp = np.array(data[i].values)
+            temp = [np.deg2rad(z) for z in temp]
+            data[i] = temp
+
+    return data
+
+def drop_activities(acc, data):
+    temp = []
+    activities = data['activity_id'].values
+    for i in data.index:
+        if activities[i] in acc:
+            temp.append(i)
+    data = data.drop(temp, axis = 0)
+
+    return data
+
 def cv_main():
+    bad_acc = [6.0, 7.0, 8.0, 12.0]
     pca = PCA(n_components=3)
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
         else:
             data = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
+            # data = drop_activities(bad_acc, data)
             data = resample(data, 100)
+            data = deg2rad(data)
             # data = data.drop(['timestamp'], axis = 1)
             sliding_windows_mhealth = preprocess.full_df_to_sliding_windows(data)
             # sliding_windows_mhealth = uci_mhealth.to_sliding_windows_shared_data(conn)
