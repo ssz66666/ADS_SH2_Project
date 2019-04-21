@@ -12,6 +12,7 @@ DATASET_LIST = [
     "uci_mhealth",
     "uci_pamap2",
     "uci_chest_accelerometer",
+    "uci_smartphone",
 ]
 
 def load_all_datasets(conn, path, *datasets):
@@ -35,6 +36,7 @@ def main(argv):
             print("Force updating PAMAP2 dataset from %s" % NEW_PAMAP2_PATH)
             m = get_dataset_loader_module("uci_pamap2")
             m._HACK_force_store_updated_dataset_to_sql(conn.cursor(), NEW_PAMAP2_PATH)
+            conn.commit()
 
 if __name__ == "__main__":
     main(sys.argv)
