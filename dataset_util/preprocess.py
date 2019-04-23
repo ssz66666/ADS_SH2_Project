@@ -4,6 +4,8 @@
 import numpy as np
 import pandas as pd
 
+from misc import mul_str_arr
+
 DEFAULT_WINDOW_SIZE = 100
 DEFAULT_WINDOW_OVERLAP = 0
 
@@ -69,6 +71,17 @@ def concat_datasets(*dfs, columns=None):
         columns = dfs[0].columns
     new_val = np.vstack(map(lambda x: x.values, dfs))
     return pd.DataFrame(new_val, columns=columns)
+
+def compute_triaxial_norm(df, remove_triaxial_vectors=True):
+    columns = df.columns
+    sensors = [ x[:-2] for x in columns if ('_x' in x) and ((x[:-2] + '_y') in columns) and ((x[:-2] + '_z') in columns) ]
+    for sens in sensors:
+        cols = df.loc[:, ["{}_x".format(sens), "{}_y".format(sens), "{}_z".format(sens)]].values
+        norms = np.linalg.norm(cols, axis=1)
+        if remove_triaxial_vectors:
+            df.drop(labels=mul_str_arr([sens], ["x","y","z"]), axis=1, inplace=True)
+        df.insert(loc=len(df.columns), column="{}_magnitude".format(sens), value=norms)
+    return df
 
 def test():
     x = [(1,"2",3.0), (4,"5",6.0),(7,"8",9.0)]
