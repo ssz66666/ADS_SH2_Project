@@ -67,7 +67,7 @@ SELECT
                 ["x", "y", "z"])) + """
 FROM
     {0}, {1}
-WHERE {0}.sample_id = {1}.sample_id;
+WHERE {0}.sample_id = {1}.sample_id AND activity_id != 0;
 """).format(samples_table, sensor_readings_table)
 
 def to_classification(df):
@@ -84,11 +84,4 @@ def to_sliding_windows(conn, *args, **kwargs):
     for subject_id in ids:
         yield preprocess.query_to_sliding_windows(conn.execute(
             raw_table_valid_data_query_with_subject_id, (subject_id,)
-        ), *args, **kwargs)
-
-def to_sliding_windows_shared_data(conn, *args, **kwargs):
-    ids = get_subject_ids(conn)
-    for subject_id in ids:
-        yield preprocess.query_to_sliding_windows(conn.execute(
-            raw_table_valid_data_query_with_subject_id_shared_data, (subject_id,)
         ), *args, **kwargs)
