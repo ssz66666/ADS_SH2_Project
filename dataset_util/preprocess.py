@@ -60,6 +60,16 @@ def remap_label(df, label_map, strip_null_activity=True):
         df = df[df["activity_id"] != 0]
     return df
             
+def concat_datasets(*dfs, columns=None):
+    if len(dfs) < 1:
+        raise ValueError("no dataframe to concatenate")
+    if len(dfs) == 1:
+        return dfs[0]
+    if columns is None:
+        columns = dfs[0].columns
+    new_val = np.vstack(map(lambda x: x.values, dfs))
+    return pd.DataFrame(new_val, columns=columns)
+
 def test():
     x = [(1,"2",3.0), (4,"5",6.0),(7,"8",9.0)]
     slided = list(to_sliding_windows(x, col_headings=None, size=2))
