@@ -51,6 +51,14 @@ def to_sliding_windows(rows, col_headings=None, size=DEFAULT_WINDOW_SIZE, overla
             arr = arr[size-overlap:]
             yield pd.DataFrame(_arr, columns=col_headings)
     return
+
+# remaps column with label "activity_id" based on label_map, strip rows with activity_id == 0
+# if strip_null_activity is True (default True).
+def remap_label(df, label_map, strip_null_activity=True):
+    df["activity_id"] = df["activity_id"].apply(lambda d: label_map.get(d, 0))
+    if strip_null_activity:
+        df = df[df["activity_id"] != 0]
+    return df
             
 def test():
     x = [(1,"2",3.0), (4,"5",6.0),(7,"8",9.0)]
