@@ -24,6 +24,7 @@ def extract_features(df_windows,all_feature):
 
     check = 0
     input_features = []
+    index_feature = 0
     # no_cols = 0
 
     for winds in df_windows:
@@ -33,8 +34,8 @@ def extract_features(df_windows,all_feature):
 
             if (check==0):
                 column_headers = df_window.columns.values
-                no_cols = len(column_headers)
-                column_headers = column_headers[2:len(column_headers)]
+                index_feature = list(column_headers).index("subject_id") + 1
+                column_headers = column_headers[index_feature:len(column_headers)]
                 check = 1
 
             #print(df_window['activity_id'].value_counts().idxmax()," ",df_window['subject_id'].iloc[0])
@@ -42,7 +43,7 @@ def extract_features(df_windows,all_feature):
             features.append(df_window['activity_id'].value_counts().idxmax()) # to find the most frequent value in the activity_id col
             features.append(df_window['subject_id'].iloc[0])
             
-            f = np.apply_along_axis(_get_features, 0, df_window.iloc[:,2:]).flatten()
+            f = np.apply_along_axis(_get_features, 0, df_window.iloc[:,index_feature:]).flatten()
             features = np.hstack((features, f))
             # for (idx, col) in enumerate(df_window.T[2:]):
 
