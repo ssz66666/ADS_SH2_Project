@@ -11,6 +11,8 @@ from config import SQLITE_DATABASE_FILE, RAW_DATASET_DIR
 DATASET_LIST = [
     "uci_mhealth",
     "uci_pamap2",
+    "uci_chest_accelerometer",
+    "uci_smartphone",
 ]
 
 def load_all_datasets(conn, path, *datasets):
@@ -22,6 +24,8 @@ def load_all_datasets(conn, path, *datasets):
             if m.check_sqlite_table_not_exists(cur):
                 m.load_dataset_to_sqlite(cur, raw_path)
                 conn.commit()
+        else:
+            print("module not found for ", dataset)
 
 NEW_PAMAP2_PATH = "raw_dataset/uci_pamap2/PAMAP2_finalDataset"
 
@@ -32,6 +36,7 @@ def main(argv):
             print("Force updating PAMAP2 dataset from %s" % NEW_PAMAP2_PATH)
             m = get_dataset_loader_module("uci_pamap2")
             m._HACK_force_store_updated_dataset_to_sql(conn.cursor(), NEW_PAMAP2_PATH)
+            conn.commit()
 
 if __name__ == "__main__":
     main(sys.argv)
