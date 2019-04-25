@@ -64,6 +64,8 @@ def load_dataset_to_sqlite(cur, path):
     store_dataset_to_sql(cur, tbls)
 
 def row_generator(tbls, index=1):
+    # TODO fix sliding window related problem
+    raise NotImplementedError("FIX ME")
     for tbl in tbls:
         timestamp = Decimal('0')
         last_subject = None
