@@ -32,7 +32,7 @@ def axes_normaliser_2(data, regions, measurements):
     #     l = 0; u = 5;
         for x in data.columns:
             if r in x and 'acc' in x:
-                n = int(len(data)/100)  # chunk row size
+                n = int(len(data)/10000)  # chunk row size
                 if 'x' in x:
                     list_x = [data[x][i:i + n].values for i in range(0, data.shape[0], n)]
                 if 'y' in x:
@@ -87,7 +87,7 @@ def axes_normaliser_2(data, regions, measurements):
             fixed_x = []; fixed_y = []; fixed_z = []
             for x in data.columns:
                 if r in x and m in x:
-                    n = int(len(data) / 100)  # chunk row size
+                    n = int(len(data) / 10000)  # chunk row size
                     if m not in params:
                         params.append(m)
                     if 'x' in x:
