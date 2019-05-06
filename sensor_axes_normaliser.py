@@ -13,12 +13,20 @@ import numpy as np
 from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
 import os
 
-def axes_normaliser(data, regions, measurements, standing, walking):
+def axes_normaliser_1(data, regions, preferred, measurements, standing, walking, acc_maps):
     df = pd.DataFrame()
-    df['activity_id'] = data['activity_id']
+    acc_id = data['activity_id'].values
     df['subject_id'] = data['subject_id']
     s_index = data.index[data['activity_id'] == standing]
     w_index = data.index[data['activity_id'] == walking]
+
+    if len(acc_maps) > 0:
+        for x in acc_maps:
+            for i in range(len(acc_id)):
+                if acc_id[i] == x[0]:
+                    acc_id[i] = x[1]
+
+    df['activity_id'] = acc_id
 
     for r in regions:
         params = []; temps = []
@@ -54,7 +62,7 @@ def axes_normaliser(data, regions, measurements, standing, walking):
         for m in range(len(measurements)):
             neg = 1
             if 'acc' in measurements[m]:
-                if (np.mean(eval('temp_' + str(m + 1))[z-1][s_index])) < 0:
+                if (np.mean(eval('temp_' + str(m + 1))[z-1])) < 0:
                     neg = -1
 
                 eval('temp_' + str(m + 1))[z-1] = eval('temp_' + str(m + 1))[z-1] * neg
@@ -65,7 +73,7 @@ def axes_normaliser(data, regions, measurements, standing, walking):
         c1=0;c2=0;c3=0
         for i in ['x', 'y', 'z']:
             for j in range(len(params)):
-                df[r + '_' + params[j] + '_' + i] = eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
+                df[preferred[regions.index(r)] + '_' + params[j] + '_' + i] = eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
 
     return df
 
