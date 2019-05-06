@@ -5,12 +5,19 @@ from itertools import chain
 from dataset_util import uci_mhealth
 import sqlite3
 from config import SQLITE_DATABASE_FILE
+import scipy.stats as stats
 
 def _get_features(col):
     fft_result = np.sqrt(np.abs(fft(col)))
     fft_quantile = np.quantile(fft_result, [0, 0.25, 0.5, 0.75, 1])
     fft_mean = np.mean(fft_result)
     fft_snr = fft_quantile[-1]/fft_mean
+    sma = np.sum(col)
+    energy = np.mean(np.square(col))
+    stdv = np.std(col)
+    skewness = stats.skew(fft_result)
+    kurtosis = stats.kurtosis(fft_result)
+    
     return np.array([
         np.mean(col),
         *np.quantile(col, [0, 0.25, 0.5, 0.75, 1]),
@@ -18,6 +25,11 @@ def _get_features(col):
         fft_quantile[-1],
         fft_mean,
         fft_snr,
+        sma,
+        energy,
+        stdv,
+        skewness,
+        kurtosis,
     ])
 
 def extract_features(df_windows,all_feature):
@@ -86,7 +98,8 @@ def extract_features(df_windows,all_feature):
     return df_features
 
 all_feature = ['mean','quantile_1','quantile_2','quantile_3', 'quantile_4','quantile_5','fft_quantile_1',
-                    'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR']
+                    'fft_quantile_2','fft_quantile_3', 'fft_quantile_4','fft_quantile_5','fft_max','fft_avg','fft_SNR',
+                    'SMA', 'energy', 'stdv', 'fft_skewness', 'fft_kurtosis']
 
 def main():
     # Connection to the DB and retrieve sliding windows
