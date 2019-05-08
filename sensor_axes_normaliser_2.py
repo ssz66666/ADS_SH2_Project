@@ -14,6 +14,8 @@ from config import SQLITE_DATABASE_FILE, TRAINING_SET_PROPORTION
 import os
 import random
 from sensor_axes_normaliser import axes_normaliser_1
+from resample import resample
+
 
 def axes_normaliser_2(data, regions, measurements):
     df = pd.DataFrame()
@@ -25,6 +27,7 @@ def axes_normaliser_2(data, regions, measurements):
 
 
     for r in regions:
+        c = 0
         orientation_list = []
         params = [];
 
@@ -42,7 +45,7 @@ def axes_normaliser_2(data, regions, measurements):
 
         # rand = random.randint(0, 7)
         rand = 1
-        bins = [-20, -15, -10, -5, 0, 5, 10, 15, 20]
+        bins = [-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]
         control_x = np.histogram(list_x[rand], bins=bins, density=True)
         control_x = [control_x[0][n]*(control_x[1][n+1]-control_x[1][n]) for n in range(len(control_x[0]))]
 
@@ -56,6 +59,8 @@ def axes_normaliser_2(data, regions, measurements):
         # print(control_z)
         for i in range(len(list_x)):
             if i != rand:
+                c+=1
+
                 test_x = np.histogram(list_x[i], bins=bins, density=True)
                 test_x = np.array([test_x[0][n] * (test_x[1][n + 1] - test_x[1][n]) for n in range(len(test_x[0]))])
 
@@ -63,6 +68,8 @@ def axes_normaliser_2(data, regions, measurements):
                 test_y = np.array([test_y[0][n] * (test_y[1][n + 1] - test_y[1][n]) for n in range(len(test_y[0]))])
 
                 test_z = np.histogram(list_z[i], bins=bins, density=True)
+                # if c == 1106:
+                #     print(test_z)
                 test_z = np.array([test_z[0][n] * (test_z[1][n + 1] - test_z[1][n]) for n in range(len(test_z[0]))])
 
                 dist1 = best_orientation(control_x, control_y, control_z, test_x, test_y, test_z)
@@ -141,15 +148,15 @@ def cv_main():
             # print(features_mhealth)
         else:
             data_mhealth = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
+            # data_mhealth = resample(data_mhealth, 100)
+            # data_mhealth.to_pickle('mhealth.pkl')
+            data_mhealth = deg2rad(data_mhealth)
             data_mhealth = axes_normaliser_1(data_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['chest', 'ankle', 'hand'],  ['acc', 'gyro'], 1, 4, [])
             # data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
             # print(data)
             # data_mhealth.to_pickle('mhealth_reformatted.pickle')
             # print(data)
             # data = drop_activities(bad_acc, data)
-            # data = resample(data, 100)
-            data_mhealth = deg2rad(data_mhealth)
-            # data = data.drop(['timestamp'], axis = 1)
             # sliding_windows_mhealth = preprocess.full_df_to_sliding_windows(data)
             # sliding_windows_mhealth = uci_mhealth.to_sliding_windows_shared_data(conn)
             # features_mhealth = extract_features(sliding_windows_mhealth, all_feature)
@@ -172,8 +179,9 @@ def cv_main():
 #             # features_pamap.to_pickle('pamap_features.pkl')
 
     data = pd.concat([data_mhealth, data_pamap])
+    data.to_pickle('data.pkl')
     data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
-    data.to_pickle('fully_reformatted.pkl')
+    data.to_pickle('fully_reformatted_2.pkl')
 #
 if __name__ == "__main__":
     # main()
