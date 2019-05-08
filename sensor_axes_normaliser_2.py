@@ -15,6 +15,8 @@ import os
 import random
 from sensor_axes_normaliser import axes_normaliser_1
 from resample import resample
+from pyquaternion import Quaternion
+from tqdm import tqdm
 
 
 def axes_normaliser_2(data, regions, measurements):
@@ -23,8 +25,35 @@ def axes_normaliser_2(data, regions, measurements):
     df['subject_id'] = data['subject_id']
     print(len(df))
 
-    orienatations = [['x', 'y', 'z'], ['x', 'z', 'y'], ['y', 'x', 'z'], ['y', 'z', 'x'], ['z', 'x', 'y'], ['z', 'y', 'x']]
-
+    # orienatations = [['x', 'y', 'z'], ['x', 'z', 'y'], ['y', 'x', 'z'], ['y', 'z', 'x'], ['z', 'x', 'y'], ['z', 'y', 'x']]
+    sin_quarter_pi = np.sin(np.pi/4.0)
+    orientations = [
+        np.array([1,0,0,0]),
+        np.array([sin_quarter_pi,0,sin_quarter_pi,0]),
+        np.array([0,0,1,0]),
+        np.array([sin_quarter_pi,0,-sin_quarter_pi,0]),
+        np.array([sin_quarter_pi,0,0,sin_quarter_pi]),
+        np.array([0.5,0.5,0.5,0.5]),
+        np.array([0,sin_quarter_pi,sin_quarter_pi,0]),
+        np.array([0.5,-0.5,-0.5,0.5]),
+        np.array([sin_quarter_pi,0,0,-sin_quarter_pi]),
+        np.array([0.5,-0.5,0.5,-0.5]),
+        np.array([0,-sin_quarter_pi,sin_quarter_pi,0]),
+        np.array([0.5,0.5,-0.5,-0.5]),
+        np.array([sin_quarter_pi,sin_quarter_pi,0,0]),
+        np.array([0.5,0.5,0.5,-0.5]),
+        np.array([0,0,sin_quarter_pi,-sin_quarter_pi]),
+        np.array([0.5,0.5,-0.5,0.5]),
+        np.array([0,1,0,0]),
+        np.array([0,sin_quarter_pi,0,-sin_quarter_pi]),
+        np.array([0,0,0,1]),
+        np.array([0,sin_quarter_pi,0,sin_quarter_pi]),
+        np.array([sin_quarter_pi,-sin_quarter_pi,0,0]),
+        np.array([0.5,-0.5,0.5,0.5]),
+        np.array([0,0,sin_quarter_pi,sin_quarter_pi]),
+        np.array([0.5,-0.5,-0.5,-0.5]),
+    ]
+    rot_quaternions = [Quaternion(rot) for rot in orientations]
 
     for r in regions:
         c = 0
@@ -72,20 +101,20 @@ def axes_normaliser_2(data, regions, measurements):
                 #     print(test_z)
                 test_z = np.array([test_z[0][n] * (test_z[1][n + 1] - test_z[1][n]) for n in range(len(test_z[0]))])
 
-                dist1 = best_orientation(control_x, control_y, control_z, test_x, test_y, test_z)
-                dist2 = best_orientation(control_x, control_y, control_z, test_x, test_z, test_y)
-                dist3 = best_orientation(control_x, control_y, control_z, test_y, test_x, test_z)
-                dist4 = best_orientation(control_x, control_y, control_z, test_y, test_z, test_x)
-                dist5 = best_orientation(control_x, control_y, control_z, test_z, test_x, test_y)
-                dist6 = best_orientation(control_x, control_y, control_z, test_z, test_y, test_x)
-
-                distances = [dist1, dist2, dist3, dist4, dist5, dist6]
+                # dist1 = best_orientation(control_x, control_y, control_z, test_x, test_y, test_z)
+                # dist2 = best_orientation(control_x, control_y, control_z, test_x, test_z, test_y)
+                # dist3 = best_orientation(control_x, control_y, control_z, test_y, test_x, test_z)
+                # dist4 = best_orientation(control_x, control_y, control_z, test_y, test_z, test_x)
+                # dist5 = best_orientation(control_x, control_y, control_z, test_z, test_x, test_y)
+                # dist6 = best_orientation(control_x, control_y, control_z, test_z, test_y, test_x)
+                test_vec = np.column_stack([test_x,test_y,test_z])
+                distances = [best_orientation(control_x,control_y,control_z, *np.apply_along_axis(rot.rotate, 1, test_vec).T) for rot in rot_quaternions]
                 # print(distances.index(min(np.array(distances))))
-                orientation = orienatations[distances.index(min(np.array(distances)))]
+                orientation = rot_quaternions[distances.index(min(np.array(distances)))]
                 # print(orientation)
                 orientation_list.append(orientation)
             if i == rand:
-                orientation_list.append(['x', 'y', 'z'])
+                orientation_list.append(rot_quaternions[0])
 
 
         final_fixed_x = []; final_fixed_y = []; final_fixed_z = []
@@ -104,10 +133,16 @@ def axes_normaliser_2(data, regions, measurements):
                     if 'z' in x:
                         temp_z = [data[x][i:i + n].values for i in range(0, data.shape[0], n)]
 
-            for q in range(len(orientation_list)):
-                fixed_x = np.concatenate((fixed_x, eval('temp_' + orientation_list[q][0])[q]), axis=0)
-                fixed_y = np.concatenate((fixed_y, eval('temp_' + orientation_list[q][1])[q]), axis=None)
-                fixed_z = np.concatenate((fixed_z, eval('temp_' + orientation_list[q][2])[q]), axis=None)
+            for q in tqdm(range(len(orientation_list))):
+                temp_vec = np.column_stack((temp_x[q],temp_y[q],temp_z[q]))
+                fixed_vec = np.apply_along_axis(orientation_list[q].rotate, 1, temp_vec)
+                fixed_x = np.concatenate((fixed_x,fixed_vec[:,0]))
+                fixed_y = np.concatenate((fixed_y,fixed_vec[:,1]))
+                fixed_z = np.concatenate((fixed_z,fixed_vec[:,2]))
+
+                # fixed_x = np.concatenate((fixed_x, eval('temp_' + orientation_list[q][0])[q]), axis=0)
+                # fixed_y = np.concatenate((fixed_y, eval('temp_' + orientation_list[q][1])[q]), axis=None)
+                # fixed_z = np.concatenate((fixed_z, eval('temp_' + orientation_list[q][2])[q]), axis=None)
 
             final_fixed_x.append(fixed_x); final_fixed_y.append(fixed_y); final_fixed_z.append(fixed_z)
 
@@ -181,7 +216,7 @@ def cv_main():
     data = pd.concat([data_mhealth, data_pamap])
     data.to_pickle('data.pkl')
     data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
-    data.to_pickle('fully_reformatted_2.pkl')
+    data.to_pickle('fully_reformatted_3.pkl')
 #
 if __name__ == "__main__":
     # main()
