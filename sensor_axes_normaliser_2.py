@@ -29,7 +29,7 @@ def axes_normaliser_2(data, regions, measurements):
     for r in regions:
         c = 0
         orientation_list = []
-        params = [];
+        params = []
 
         #     acc_track = []
     #     l = 0; u = 5;
@@ -144,7 +144,7 @@ def cv_main():
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
-            features_mhealth = axes_normaliser(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
+            features_mhealth = axes_normaliser_1(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
             # print(features_mhealth)
         else:
             data_mhealth = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
