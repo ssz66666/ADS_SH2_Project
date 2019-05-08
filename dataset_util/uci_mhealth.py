@@ -6,6 +6,10 @@ from dataset_util import preprocess
 from dataset_util.preprocess import DEFAULT_WINDOW_SIZE, DEFAULT_WINDOW_OVERLAP
 from misc import mul_str_arr
 
+# uci_mhealth
+# acc unit: m/s^2
+# gyro unit: deg/s
+
 distinct_subject_query = """
 SELECT DISTINCT subject_id FROM {};
 """.format(samples_table)

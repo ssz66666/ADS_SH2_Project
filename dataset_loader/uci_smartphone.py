@@ -65,15 +65,19 @@ def load_dataset_to_sqlite(cur, path):
 
 def row_generator(tbls, index=1):
     # TODO fix sliding window related problem
-    raise NotImplementedError("FIX ME")
+    # raise NotImplementedError("FIX ME")
     for tbl in tbls:
         timestamp = Decimal('0')
         last_subject = None
         for row in tbl:
+            l_row2 = len(row[2])
             if row[0][0] != last_subject:
                 timestamp = Decimal('0')
                 last_subject = row[0][0]
-            for i in range(len(row[2])):
+                sensor_row_iter = range(l_row2)
+            else:
+                sensor_row_iter = range(l_row2 >> 1, l_row2)
+            for i in sensor_row_iter:
                 yield (index, timestamp, i, row)
                 index = index + 1
                 timestamp += sampling_interval
