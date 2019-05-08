@@ -61,7 +61,16 @@ def remap_label(df, label_map, strip_null_activity=True):
     if strip_null_activity:
         df = df[df["activity_id"] != 0]
     return df
-            
+
+def remap_subject_ids(dfs, sid_label='subject_id'):
+    unik_sids = [ np.unique(df[sid_label]) for df in dfs ]
+    n_sids = sum([ len(a) for a in unik_sids])
+    new_ids = iter(range(1, n_sids+1))
+    mappings = [ { old_id: next(new_ids) for old_id in sids } for sids in unik_sids ]
+    for (df, mapping) in zip(dfs, mappings):
+        df.loc[:, sid_label] = np.apply_along_axis(lambda x: np.array([mapping[v] for v in x]), 0, df.loc[:, sid_label])
+    return dfs
+
 def concat_datasets(*dfs, columns=None):
     if len(dfs) < 1:
         raise ValueError("no dataframe to concatenate")
