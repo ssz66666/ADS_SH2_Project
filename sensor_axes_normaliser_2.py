@@ -29,7 +29,7 @@ def axes_normaliser_2(data, regions, measurements):
     for r in regions:
         c = 0
         orientation_list = []
-        params = [];
+        params = []
 
         #     acc_track = []
     #     l = 0; u = 5;
