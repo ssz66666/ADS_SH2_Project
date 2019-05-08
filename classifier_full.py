@@ -35,19 +35,12 @@ def main():
     #     # features = pd.read_sql_query(uci_mhealth.raw_table_valid_data_query, conn)
     #     sliding_windows = uci_mhealth.to_sliding_windows(conn)
     #     subject_ids = uci_mhealth.get_subject_ids(conn)
-    data = pd.read_pickle('fully_reformatted_2.pkl')
-    # data = data.loc[data['activity_id'].isin([1, 2, 3, 4, 9, 11])]
-    subject_ids = data['subject_id']
-    sliding_windows = preprocess.full_df_to_sliding_windows(data)
+    data = pd.read_pickle('fully_reformatted_3.pkl')
+    data = data.loc[data['activity_id'].isin([1, 2, 3, 4, 9, 11])]
+    sliding_windows = preprocess.full_df_to_sliding_windows(data, size=100, overlap=50)
     features = extract_features(sliding_windows, all_feature)
-    n_subs = len(subject_ids)
-    n_training = round(n_subs * TRAINING_SET_PROPORTION)
-    # n_test = n_subs - n_training
-    idx = np.isin(features.loc[:, "subject_id"], subject_ids[:n_training])
 
-    training_set = features[idx]
-    test_set = features[np.logical_not(idx)]
-    from sklearn.model_selection import train_test_split
+    from sklearn.model_selection import train_test_split, GroupShuffleSplit
 
     # train_X, train_y = uci_mhealth.to_classification(training_set)
     # test_X, test_y = uci_mhealth.to_classification(test_set)
@@ -59,13 +52,22 @@ def main():
 
     np.set_printoptions(threshold=sys.maxsize)
     # print(train_y)
-    print(features['activity_id'].values)
-    train_X, test_X, train_y, test_y = train_test_split(features, [int(n) for n in features['activity_id'].values], test_size=0.3, shuffle=False, random_state=42)
+    # print(features['activity_id'].values)
+    gss = GroupShuffleSplit(test_size=0.3, random_state=42)
+    X, y, groups = preprocess.to_classification(features)
+    y = pd.Series([int(n) for n in y.values])
+    # train_X, test_X, train_y, test_y = train_test_split(features, [int(n) for n in features['activity_id'].values], test_size=0.3, shuffle=False, random_state=42)
+    training_ind, test_ind = next(gss.split(X.values, groups=groups))
+    train_X = X.values[training_ind]
+    test_X = X.values[test_ind]
+    train_y = y.values[training_ind]
+    test_y = y.values[test_ind]
+    # print(train_y)
 
-    print('train x: ', train_X)
-    print('train y: ', train_y)
-    print('test X: ', test_X)
-    print('test y: ', test_y)
+    # print('train x: ', train_X)
+    # print('train y: ', train_y)
+    # print('test X: ', test_X)
+    # print('test y: ', test_y)
 
     # print("training set:", np.shape(train_X))
     # print("test set:", np.shape(test_X))

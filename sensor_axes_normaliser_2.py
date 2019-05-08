@@ -179,7 +179,8 @@ def cv_main():
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
-            features_mhealth = axes_normaliser_1(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
+            raise NotImplementedError
+            # features_mhealth = axes_normaliser_1(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
             # print(features_mhealth)
         else:
             data_mhealth = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
@@ -212,8 +213,7 @@ def cv_main():
 #             # # sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
 #             # features_pamap = extract_features(sliding_windows_pamap, all_feature)
 #             # features_pamap.to_pickle('pamap_features.pkl')
-
-    data = pd.concat([data_mhealth, data_pamap])
+    data = pd.concat(preprocess.remap_subject_ids([data_mhealth, data_pamap]))
     data.to_pickle('data.pkl')
     data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
     data.to_pickle('fully_reformatted_3.pkl')
