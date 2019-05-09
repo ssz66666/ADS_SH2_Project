@@ -51,24 +51,28 @@ def axes_normaliser_1(data, regions, preferred, measurements, standing, walking,
                     # if measurements[v] not in params:
                     params.append(measurements[v])
 
-        q = 10; w = 10; z = 4; x = 4; y = 4
+        q = []; w = []; z = 4; x = 4; y = 4
         for m in range(len(measurements)):
             if 'acc' in measurements[m]:
                 for i in range(len(eval('temp_'+str(m+1)))):
                     neg = 1
                     if (np.mean(eval('temp_' + str(m+1))[i][s_index])) < 0:
                         neg = -1
-                    # print(abs(np.mean(eval('temp_' + str(m+1))[i][s_index] - 9.81)))
-                    if abs(np.mean(eval('temp_' + str(m+1))[i][s_index] - neg*9.81)) < q:
-                        q = abs(np.mean(eval('temp_' + str(m+1))[i][s_index]) - neg*9.81)
-                        z = i+1
-                    if abs(np.mean(eval('temp_' + str(m+1))[i][w_index])) < w:
-                        w = abs(np.mean(eval('temp_' + str(m+1))[i][w_index]))
-                        y = i+1
+                    # print(abs(np.mean(eval('temp_' + str(m+1))[i][s_index]))-9.81)
+                    # if abs(np.mean(eval('temp_' + str(m+1))[i][s_index])-9.81) < q:
+                    q.append(np.mean(eval('temp_' + str(m+1))[i][s_index]) - neg*9.81)
+                        # z = i+1
+                    # if abs(np.mean(eval('temp_' + str(m+1))[i][w_index])) < w:
+                    w.append(np.mean(eval('temp_' + str(m+1))[i][w_index]))
+                        # y = i+1
+
+        z = q.index(min(q, key=abs)) + 1
+        y = w.index(min(w, key=abs)) + 1
 
         neg = 1
         for m in range(len(measurements)):
             if 'acc' in measurements[m]:
+                # print(z)
                 if (np.mean(eval('temp_' + str(m + 1))[z-1])) < -5:
                     neg = -1
 
@@ -78,6 +82,7 @@ def axes_normaliser_1(data, regions, preferred, measurements, standing, walking,
             if i != z and i != y:
                 x = i
         c1=0;c2=0;c3=0
+        print(x, y, z)
         if neg == -1:
             for i in ['x', 'y', 'z']:
                 if i == 'x':

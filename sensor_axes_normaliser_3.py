@@ -5,7 +5,7 @@ import sqlite3
 
 from datetime import datetime as dt
 
-from dataset_util import preprocess, uci_mhealth, uci_pamap2
+from dataset_util import preprocess, uci_mhealth, uci_pamap2, uci_smartphone
 from dataset_util.extract_input_features import all_feature, extract_features
 # import matplotlib.pyplot as plt
 
@@ -66,7 +66,6 @@ def axes_normaliser_2(data, regions, measurements):
         params = []
 
         for subj in subj_list:
-            print(subj)
             temp = data.loc[data['subject_id'] == subj]
             # print(temp)
             for x in data.columns:
@@ -199,7 +198,7 @@ def cv_main():
             # data_mhealth = resample(data_mhealth, 100)
             # data_mhealth.to_pickle('mhealth.pkl')
             data_mhealth = deg2rad(data_mhealth)
-            data_mhealth = axes_normaliser_1(data_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['chest', 'ankle', 'hand'],  ['acc', 'gyro'], 1, 4, [])
+            data_mhealth = axes_normaliser_1(data_mhealth, ['chest'], ['chest'],  ['acc'], 1, 4, [])
             # data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
             # print(data)
             # data_mhealth.to_pickle('mhealth_reformatted.pickle')
@@ -214,10 +213,21 @@ def cv_main():
         else:
             data_pamap = pd.read_sql_query(uci_pamap2.raw_table_query_shared_data, conn)
             maps = [[1, 3], [3, 1], [5, 11], [6, 9]]
-            data_pamap = axes_normaliser_1(data_pamap, ['chest', 'ankle', 'hand'], ['chest', 'ankle', 'hand'], ['acc', 'gyro'], 3, 4, maps)
+            data_pamap = axes_normaliser_1(data_pamap, ['chest'], ['chest'], ['acc'], 3, 4, maps)
             data_pamap.index = [x + len(data_mhealth) for x in data_pamap.index]
 #             print(data)
 #             data.to_pickle('pamap_reformatted.pickle')
+
+        if os.path.exists('smartphone_features.pkl'):
+            features_pamap = pd.read_pickle('smartphone_features.pkl')
+        else:
+            data_smartphone = pd.read_sql_query(uci_smartphone.raw_table_query_shared_data, conn)
+            data_smartphone = uci_smartphone.small_g_to_m_per_sec_sq(data_smartphone)
+            maps = [[1, 4], [2, 50], [3, 51], [4, 2], [5, 1], [6, 3]]
+            subj_maps = np.unique(data_smartphone['subject_id'].values)
+            data_smartphone = axes_normaliser_1(data_smartphone, ['body'], ['chest'], ['acc'], 5, 1, maps)
+            print(data_smartphone.index)
+            data_smartphone.index = [x + len(data_mhealth) + len(data_pamap) for x in data_smartphone.index]
 #
 #             # # data = resample(data, 50)
 #             # data = data.drop(['timestamp'], axis = 1)
@@ -225,9 +235,9 @@ def cv_main():
 #             # # sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
 #             # features_pamap = extract_features(sliding_windows_pamap, all_feature)
 #             # features_pamap.to_pickle('pamap_features.pkl')
-    data = pd.concat(preprocess.remap_subject_ids([data_mhealth, data_pamap]))
+    data = pd.concat(preprocess.remap_subject_ids([data_mhealth, data_pamap, data_smartphone]))
     data.to_pickle('data.pkl')
-    data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
+    data = axes_normaliser_2(data, ['chest'], ['acc'])
     data.to_pickle('fully_reformatted_3.pkl')
 #
 if __name__ == "__main__":

@@ -5,7 +5,7 @@ import sqlite3
 
 from datetime import datetime as dt
 
-from dataset_util import preprocess, uci_mhealth, uci_pamap2
+from dataset_util import preprocess, uci_mhealth, uci_pamap2, uci_smartphone
 from dataset_util.extract_input_features import all_feature, extract_features
 # import matplotlib.pyplot as plt
 
@@ -126,11 +126,11 @@ def axes_normaliser_2(data, regions, measurements):
                     n = int(len(data) / 10000)  # chunk row size
                     if m not in params:
                         params.append(m)
-                    if 'x' in x:
+                    if '_x' in x:
                         temp_x = [data[x][i:i + n].values for i in range(0, data.shape[0], n)]
-                    if 'y' in x:
+                    if '_y' in x:
                         temp_y = [data[x][i:i + n].values for i in range(0, data.shape[0], n)]
-                    if 'z' in x:
+                    if '_z' in x:
                         temp_z = [data[x][i:i + n].values for i in range(0, data.shape[0], n)]
 
             for q in tqdm(range(len(orientation_list))):
@@ -151,6 +151,7 @@ def axes_normaliser_2(data, regions, measurements):
                 # print(len(eval('final_fixed_' + i)[j]))
                 df[r + '_' + params[j] + '_' + i] = eval('final_fixed_' + i)[j]
 
+    print('im at the final frontier')
     return df
 
 def best_orientation(control_x, control_y, control_z, test_x, test_y, test_z):
@@ -179,15 +180,16 @@ def cv_main():
     with sqlite3.connect(SQLITE_DATABASE_FILE) as conn:
         if os.path.exists('mhealth_features.pkl'):
             features_mhealth = pd.read_pickle('mhealth_features.pkl')
-            raise NotImplementedError
-            # features_mhealth = axes_normaliser_1(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
+            features_mhealth = axes_normaliser_1(features_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['acc', 'gyro'])
             # print(features_mhealth)
         else:
             data_mhealth = pd.read_sql_query(uci_mhealth.raw_table_query_shared_data, conn)
-            # data_mhealth = resample(data_mhealth, 100)
-            # data_mhealth.to_pickle('mhealth.pkl')
+            data_mhealth = resample(data_mhealth, 100)
             data_mhealth = deg2rad(data_mhealth)
             data_mhealth = axes_normaliser_1(data_mhealth, ['chest', 'left_ankle', 'right_lower_arm'], ['chest', 'ankle', 'hand'],  ['acc', 'gyro'], 1, 4, [])
+            data_mhealth.index = np.linspace(0, len(data_mhealth)-1, len(data_mhealth))
+            data_mhealth.to_pickle('mhealth_resampled.pkl')
+
             # data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
             # print(data)
             # data_mhealth.to_pickle('mhealth_reformatted.pickle')
@@ -202,7 +204,9 @@ def cv_main():
         else:
             data_pamap = pd.read_sql_query(uci_pamap2.raw_table_query_shared_data, conn)
             maps = [[1, 3], [3, 1], [5, 11], [6, 9]]
+            subj_maps = np.unique(data_mhealth['subject_id'].values)
             data_pamap = axes_normaliser_1(data_pamap, ['chest', 'ankle', 'hand'], ['chest', 'ankle', 'hand'], ['acc', 'gyro'], 3, 4, maps)
+            data_pamap.to_pickle('pamap.pkl')
             data_pamap.index = [x + len(data_mhealth) for x in data_pamap.index]
 #             print(data)
 #             data.to_pickle('pamap_reformatted.pickle')
@@ -213,10 +217,29 @@ def cv_main():
 #             # # sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
 #             # features_pamap = extract_features(sliding_windows_pamap, all_feature)
 #             # features_pamap.to_pickle('pamap_features.pkl')
-    data = pd.concat(preprocess.remap_subject_ids([data_mhealth, data_pamap]))
+
+    #         if os.path.exists('smartphone_features.pkl'):
+    #             features_pamap = pd.read_pickle('smartphone_features.pkl')
+    #         else:
+    #             data_smartphone = pd.read_sql_query(uci_smartphone.raw_table_query_shared_data, conn)
+    #             maps = [[1, 4], [2, 50], [3, 51], [4, 2], [5, 1], [6, 3]]
+    #             subj_maps = np.unique(data_smartphone['subject_id'].values)
+    #             data_smartphone = axes_normaliser_1(data_smartphone, ['body'], ['chest'], ['acc', 'gyro'], 5, 1, maps, subj_maps)
+    #             data_smartphone.index = [x + len(data_pamap) +len(data_mhealth) for x in data_smartphone.index]
+    # #             print(data)
+    #             data.to_pickle('pamap_reformatted.pickle')
+    #
+    #             # # data = resample(data, 50)
+    #             # data = data.drop(['timestamp'], axis = 1)
+    #             # sliding_windows_pamap = preprocess.full_df_to_sliding_windows(data)
+    #             # # sliding_windows_pamap = uci_pamap2.to_sliding_windows_shared_data(conn)
+    #             # features_pamap = extract_features(sliding_windows_pamap, all_feature)
+    #             # features_pamap.to_pickle('pamap_features.pkl')
+
+    data = pd.concat([data_mhealth, data_pamap])
     data.to_pickle('data.pkl')
     data = axes_normaliser_2(data, ['chest', 'ankle', 'hand'], ['acc', 'gyro'])
-    data.to_pickle('fully_reformatted_3.pkl')
+    data.to_pickle('fully_reformatted_10000_resampled.pkl')
 #
 if __name__ == "__main__":
     # main()
