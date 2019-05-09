@@ -62,6 +62,9 @@ def remap_label(df, label_map, strip_null_activity=True):
         df = df[df["activity_id"] != 0]
     return df
 
+def strip_null_activity(df, null_activity_id=0):
+    return df[df["activity_id"] != null_activity_id]
+
 def remap_subject_ids(dfs, sid_label='subject_id'):
     unik_sids = [ np.unique(df[sid_label]) for df in dfs ]
     n_sids = sum([ len(a) for a in unik_sids])
