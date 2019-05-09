@@ -61,6 +61,19 @@ FROM
 WHERE {0}.sample_id = {1}.sample_id;
 """).format(samples_table, sensor_readings_table)
 
+raw_table_query_shared_data_with_null_activity = ("""
+SELECT
+    activity_id, timestamp, subject_id,
+""" +
+", ".join(mul_str_arr(["chest_acc"], ["x","y","z"]) +
+    mul_str_arr(["left_ankle", "right_lower_arm"],
+                ["acc", "gyro", "magn"],
+                ["x", "y", "z"])) + """
+FROM
+    {0}, {1}
+WHERE {0}.sample_id = {1}.sample_id;
+""").format(samples_table, sensor_readings_table)
+
 raw_table_query_shared_data = ("""
 SELECT
     activity_id, timestamp, subject_id,
