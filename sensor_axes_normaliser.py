@@ -2,6 +2,7 @@ from sklearn.ensemble import RandomForestClassifier
 import sklearn.model_selection
 import pandas as pd
 import sqlite3
+import math
 
 from datetime import datetime as dt
 
@@ -16,6 +17,7 @@ import os
 def axes_normaliser_1(data, regions, preferred, measurements, standing, walking, acc_maps):
     df = pd.DataFrame()
     acc_id = data['activity_id'].values
+    subj_id = data['subject_id'].values
     df['subject_id'] = data['subject_id']
     s_index = data.index[data['activity_id'] == standing]
     w_index = data.index[data['activity_id'] == walking]
@@ -26,7 +28,12 @@ def axes_normaliser_1(data, regions, preferred, measurements, standing, walking,
                 if acc_id[i] == x[0]:
                     acc_id[i] = x[1]
 
+    # if len(subj_maps) > 0:
+    #     for i in range(len(subj_id)):
+    #         subj_id[i] = max(subj_maps)+subj_id[i]
+
     df['activity_id'] = acc_id
+    # df['subject_id'] = subj_id/
 
     for r in regions:
         params = []; temps = []
@@ -59,25 +66,55 @@ def axes_normaliser_1(data, regions, preferred, measurements, standing, walking,
                         w = abs(np.mean(eval('temp_' + str(m+1))[i][w_index]))
                         y = i+1
 
+        neg = 1
         for m in range(len(measurements)):
-            neg = 1
             if 'acc' in measurements[m]:
-                if (np.mean(eval('temp_' + str(m + 1))[z-1])) < 0:
+                if (np.mean(eval('temp_' + str(m + 1))[z-1])) < -5:
                     neg = -1
 
-                eval('temp_' + str(m + 1))[z-1] = eval('temp_' + str(m + 1))[z-1] * neg
+                # eval('temp_' + str(m + 1))[z-1] = eval('temp_' + str(m + 1))[z-1] * neg
 
         for i in [1, 2, 3]:
             if i != z and i != y:
                 x = i
         c1=0;c2=0;c3=0
-        for i in ['x', 'y', 'z']:
-            for j in range(len(params)):
-                df[preferred[regions.index(r)] + '_' + params[j] + '_' + i] = eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
+        if neg == -1:
+            for i in ['x', 'y', 'z']:
+                if i == 'x':
+                    for j in range(len(params)):
+                        df[preferred[regions.index(r)] + '_' + params[j] + '_' + i] = eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
+                else:
+                    for j in range(len(params)):
+                        df[preferred[regions.index(r)] + '_' + params[j] + '_' + i] = -1*eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
+        else:
+            for i in ['x', 'y', 'z']:
+                for j in range(len(params)):
+                    df[preferred[regions.index(r)] + '_' + params[j] + '_' + i] = eval('temp_' + str(measurements.index(params[j])+1))[eval(i)-1]
 
     return df
 
 
+
+# def rotation_matrix(axis, theta):
+#     """
+#     Return the rotation matrix associated with counterclockwise rotation about
+#     the given axis by theta radians.
+#     """
+#     axis = np.asarray(axis)
+#     axis = axis / math.sqrt(np.dot(axis, axis))
+#     a = math.cos(theta / 2.0)
+#     b, c, d = -axis * math.sin(theta / 2.0)
+#     aa, bb, cc, dd = a * a, b * b, c * c, d * d
+#     bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
+#     return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
+#                      [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
+#                      [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
+#
+# v = [1, 1, 1]
+# axis = [1, 0, 0]
+# theta = math.pi
+#
+# print(np.dot(rotation_matrix(axis, theta), v))
 
 
 # def cv_main():
