@@ -46,8 +46,11 @@ def resample(df,new_freq, **kwargs):
     dataset = []
     for i in subject_ids:
         subject_id = df.loc[df['subject_id'] == i]
-        resampled = resample_raw_data(new_freq, subject_id, **kwargs)
-        dataset.append(resampled)
+        activity_ids = np.unique(subject_id.loc[:,"activity_id"])
+        for aid in activity_ids:
+            data_to_resample = subject_id.loc[subject_id["activity_id"] == aid]
+            resampled = resample_raw_data(new_freq, data_to_resample, **kwargs)
+            dataset.append(resampled)
 
     return pd.concat(dataset)
 
