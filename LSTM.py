@@ -237,67 +237,68 @@ def eval_cv(inputDataset, subject_col = 0, activity_col = 1, method = "lstm", nt
 
 #### Combined Dataset ####
 
-inputDataset = pd.read_pickle("fully_reformatted_10000_split.pkl")
+#inputDataset = pd.read_pickle("fully_reformatted_10000_split.pkl")
 
 #inputDataset.columns.values
 #list(set(inputDataset.iloc[:, 1]))
 #list(set(testSetRaw.iloc[:, 1]))
 #(combinedDataset.iloc[:, 0]).value_counts(sort = False)
-dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
+#dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
+#
+#def evaluateDataset(inputDataset, subject_col = 1, activity_col = 0, method = "lstm", ntree = 500,
+#                    timeSteps = 100, overlap = 50, epoch = 15, batch_size = 32, groupCV = True,
+#                    group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]], 
+#                    testSet_subj = [3, 5, 10, 11]):
+#
+#        testSet_idx = inputDataset.iloc[:,subject_col].isin(testSet_subj)
+#        testSet = inputDataset.loc[testSet_idx,:]
+#        dataset = inputDataset.loc[-testSet_idx,:]
+#        
+#        cv_res = eval_cv(inputDataset = dataset, subject_col = subject_col, 
+#                         activity_col = activity_col, method = method, ntree = ntree,
+#                         timeSteps = timeSteps, overlap = overlap, epoch = epoch, 
+#                         batch_size = batch_size, group = group, group_subj = group_subj)
+#
+#        return 0
+#
+#inputDataset = pd.read_pickle("fully_reformatted_10000_split.pkl")
+#dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
+#testSet_idx = dataset_refined.iloc[:,1].isin([3, 5, 10, 11])
+#testSet = dataset_refined.loc[testSet_idx,:]
+#dataset = dataset_refined.loc[-testSet_idx,:]
+#lstm_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
+#                            activity_col = 0, method = "lstm",
+#                            timeSteps = 100, overlap = 50, epoch = 15, 
+#                            batch_size = 32, group = True, 
+#                            group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
+#
+#inputDataset = pd.read_pickle("fully_reformatted_subject_split.pkl")
+#dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
+#testSet_idx = dataset_refined.iloc[:,1].isin([3, 5, 10, 11])
+#testSet = dataset_refined.loc[testSet_idx,:]
+#dataset = dataset_refined.loc[-testSet_idx,:]
+#lstm_cv_res_subject = eval_cv(inputDataset = dataset, subject_col = 1, 
+#                              activity_col = 0, method = "lstm",
+#                              timeSteps = 100, overlap = 50, epoch = 15, 
+#                              batch_size = 32, group = True, 
+#                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
+#
+#
+#
+#feature_dataset_10000 = pd.read_pickle("fully_reformatted_10000_split_features.pkl")
+#list(set(feature_dataset_10000.iloc[:, 1]))
+#
+#testSet_idx = feature_dataset_10000.iloc[:,1].isin([3, 5, 10, 11])
+#testSet = feature_dataset_10000.loc[testSet_idx,:]
+#dataset = feature_dataset_10000.loc[-testSet_idx,:]
+#
+#rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
+#                              activity_col = 0, method = "rf",
+#                              ntree = 500, group = True, 
+#                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
+#
+#rf_cv_res_10000_ave = transformPerf(rf_cv_res_10000)
 
-def evaluateDataset(inputDataset, subject_col = 1, activity_col = 0, method = "lstm", ntree = 500,
-                    timeSteps = 100, overlap = 50, epoch = 15, batch_size = 32, groupCV = True,
-                    group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]], 
-                    testSet_subj = [3, 5, 10, 11]):
-
-        testSet_idx = inputDataset.iloc[:,subject_col].isin(testSet_subj)
-        testSet = inputDataset.loc[testSet_idx,:]
-        dataset = inputDataset.loc[-testSet_idx,:]
-        
-        cv_res = eval_cv(inputDataset = dataset, subject_col = subject_col, 
-                         activity_col = activity_col, method = method, ntree = ntree,
-                         timeSteps = timeSteps, overlap = overlap, epoch = epoch, 
-                         batch_size = batch_size, group = group, group_subj = group_subj)
-
-        return 0
-
-inputDataset = pd.read_pickle("fully_reformatted_10000_split.pkl")
-dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
-testSet_idx = dataset_refined.iloc[:,1].isin([3, 5, 10, 11])
-testSet = dataset_refined.loc[testSet_idx,:]
-dataset = dataset_refined.loc[-testSet_idx,:]
-lstm_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
-                            activity_col = 0, method = "lstm",
-                            timeSteps = 100, overlap = 50, epoch = 15, 
-                            batch_size = 32, group = True, 
-                            group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-
-inputDataset = pd.read_pickle("fully_reformatted_subject_split.pkl")
-dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
-testSet_idx = dataset_refined.iloc[:,1].isin([3, 5, 10, 11])
-testSet = dataset_refined.loc[testSet_idx,:]
-dataset = dataset_refined.loc[-testSet_idx,:]
-lstm_cv_res_subject = eval_cv(inputDataset = dataset, subject_col = 1, 
-                              activity_col = 0, method = "lstm",
-                              timeSteps = 100, overlap = 50, epoch = 15, 
-                              batch_size = 32, group = True, 
-                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-
-
-
-feature_dataset_10000 = pd.read_pickle("fully_reformatted_10000_split_features.pkl")
-list(set(feature_dataset_10000.iloc[:, 1]))
-
-testSet_idx = feature_dataset_10000.iloc[:,1].isin([3, 5, 10, 11])
-testSet = feature_dataset_10000.loc[testSet_idx,:]
-dataset = feature_dataset_10000.loc[-testSet_idx,:]
-
-rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
-                              activity_col = 0, method = "rf",
-                              ntree = 500, group = True, 
-                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-
-rf_cv_res_10000_ave = transformPerf(rf_cv_res_10000)
 
 ntree_candidate = [100, 300, 1000, 1500]
 for i in ntree_candidate:
