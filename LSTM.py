@@ -9,10 +9,10 @@ Created on Sat Apr 27 11:02:43 2019
 #from tensorflow.contrib import rnn  
 import pandas as pd  
 import numpy as np
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.layers import LSTM
-from keras.utils import to_categorical
+#from keras.models import Sequential
+#from keras.layers import Dense, Dropout
+#from keras.layers import LSTM
+#from keras.utils import to_categorical
 from sklearn.metrics import classification_report, accuracy_score
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestClassifier
@@ -268,10 +268,10 @@ def eval_cv(inputDataset, subject_col = 0, activity_col = 1, method = "lstm", nt
 #dataset = dataset_refined.loc[-testSet_idx,:]
 #lstm_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
 #                            activity_col = 0, method = "lstm",
-#                            timeSteps = 100, overlap = 50, epoch = 15, 
+#                            timeSteps = 100, overlap = 50, epoch = 10, 
 #                            batch_size = 32, group = True, 
 #                            group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-#
+##
 #inputDataset = pd.read_pickle("fully_reformatted_subject_split.pkl")
 #dataset_refined = inputDataset.loc[inputDataset.iloc[:,0].isin([1, 2, 3, 4, 9, 11]), :]
 #testSet_idx = dataset_refined.iloc[:,1].isin([3, 5, 10, 11])
@@ -285,31 +285,31 @@ def eval_cv(inputDataset, subject_col = 0, activity_col = 1, method = "lstm", nt
 #
 #
 #
-#feature_dataset_10000 = pd.read_pickle("fully_reformatted_10000_split_features.pkl")
+feature_dataset_10000 = pd.read_pickle("fully_reformatted_10000_split_features.pkl")
 #list(set(feature_dataset_10000.iloc[:, 1]))
-#
-#testSet_idx = feature_dataset_10000.iloc[:,1].isin([3, 5, 10, 11])
+
+testSet_idx = feature_dataset_10000.iloc[:,1].isin([3, 5, 10, 11])
 #testSet = feature_dataset_10000.loc[testSet_idx,:]
-#dataset = feature_dataset_10000.loc[-testSet_idx,:]
-#
-#rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
-#                              activity_col = 0, method = "rf",
-#                              ntree = 500, group = True, 
-#                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-#
+dataset = feature_dataset_10000.loc[-testSet_idx,:]
+
+rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
+                              activity_col = 0, method = "rf",
+                              ntree = 500, group = True, 
+                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
+ave_perf = transformPerf(rf_cv_res_10000)
 #rf_cv_res_10000_ave = transformPerf(rf_cv_res_10000)
 
-
-ntree_candidate = [100, 300, 1000, 1500]
-for i in ntree_candidate:
-        rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
-                              activity_col = 0, method = "rf",
-                              ntree = i, group = True, 
-                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
-        
-        res_ave = transformPerf(rf_cv_res_10000)
-        
-        print("subject ntree:", i, "acc: ", res_ave[0])
-        
+#
+#ntree_candidate = [100, 300, 1000, 1500]
+#for i in ntree_candidate:
+#        rf_cv_res_10000 = eval_cv(inputDataset = dataset, subject_col = 1, 
+#                              activity_col = 0, method = "rf",
+#                              ntree = i, group = True, 
+#                              group_subj = [[1, 2, 4, 6, 7, 8, 9], [12, 13, 14, 15, 16, 17, 18]],)
+#        
+#        res_ave = transformPerf(rf_cv_res_10000)
+#        
+#        print("subject ntree:", i, "acc: ", res_ave[0])
+#        
 
 
